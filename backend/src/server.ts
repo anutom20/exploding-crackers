@@ -3,6 +3,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import routes from "./routes/routes";
+import { updateGameState } from "./utils";
+import { startGame } from "./startGame";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,14 +13,16 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
+app.locals.usersInRoom = {};
+app.locals.gameHosts = {};
+app.locals.socketRoomMap = {};
+app.locals.gameState = {};
+
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World!");
+  res.send("Exploding bombs game server!");
 });
 
-app.post("/api/create-room", (req: Request, res: Response) => {
-  const roomId = `room-${Math.random().toString(36).substring(2, 9)}`;
-  res.json({ roomId });
-});
+app.use("/api", routes);
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -27,40 +32,97 @@ const io = new Server(httpServer, {
   },
 });
 
-const usersInRoom: { [key: string]: { username: string; socketId: string }[] } =
-  {};
-
-const socketRoomMap: { [key: string]: string } = {};
-
 io.on("connection", (socket) => {
   socket.on("joinRoom", (roomData) => {
+    console.log("roomData", app.locals.usersInRoom[roomData.roomId]);
+    if (
+      app.locals.usersInRoom[roomData.roomId] &&
+      app.locals.usersInRoom[roomData.roomId].find(
+        (user: { username: string }) => user.username === roomData.username
+      )
+    ) {
+      socket.emit("error", "Username already exists in this room");
+      return;
+    }
     socket.join(roomData.roomId);
-    socketRoomMap[socket.id] = roomData.roomId;
+    app.locals.socketRoomMap[socket.id] = roomData.roomId;
     console.log(`User ${roomData.username} joined room: ${roomData.roomId}`);
 
-    if (!usersInRoom[roomData.roomId]) {
-      usersInRoom[roomData.roomId] = [];
+    if (!app.locals.usersInRoom[roomData.roomId]) {
+      app.locals.usersInRoom[roomData.roomId] = [];
     }
-    usersInRoom[roomData.roomId].push({
+    app.locals.usersInRoom[roomData.roomId].push({
       username: roomData.username,
       socketId: socket.id,
     });
 
+    if (roomData.host) {
+      app.locals.gameHosts[roomData.roomId] = roomData.username;
+    }
+
     console.log(socket.rooms);
 
-    io.to(roomData.roomId).emit("userList", usersInRoom[roomData.roomId]);
+    io.to(roomData.roomId).emit(
+      "players",
+      app.locals.usersInRoom[roomData.roomId]
+    );
+
+    io.to(roomData.roomId).emit(
+      "hostUsername",
+      app.locals.gameHosts[roomData.roomId]
+    );
+
+    socket.emit("playerJoined", roomData.username);
+  });
+
+  socket.on("getHostUsername", (roomId) => {
+    io.to(roomId).emit("hostUsername", app.locals.gameHosts[roomId]);
+  });
+
+  socket.on("getPlayers", (roomId) => {
+    io.to(roomId).emit("players", app.locals.usersInRoom[roomId]);
+  });
+
+  socket.on("startGame", (gameInput) => {
+    startGame(gameInput, app, socket, io);
+  });
+
+  socket.on("stopCountdownRequest", (roomId) => {
+    io.to(roomId).emit("stopCountdown");
+  });
+
+  socket.on("updateGameState", (moveData) => {
+    const roomId = moveData?.roomId;
+    if (!roomId) {
+      socket.emit("error", "Room ID not found");
+      return;
+    }
+    const gameState = app.locals.gameState[roomId];
+    if (!gameState) {
+      socket.emit("error", "Game state not found");
+      return;
+    }
+    updateGameState(
+      gameState,
+      moveData?.currentPlayerMove,
+      moveData?.playerUsernames,
+      moveData?.favorFromUsername,
+      moveData?.placeExplosionCardInMiddle
+    );
+    io.to(roomId).emit("gameStateUpdate", gameState);
   });
 
   socket.on("disconnect", () => {
     console.log("A user disconnected");
-    const roomId = socketRoomMap[socket.id];
-    delete socketRoomMap[socket.id];
-    const usernameIndex = usersInRoom[roomId]?.findIndex(
-      (user) => user.socketId === socket.id
+    const roomId = app.locals.socketRoomMap[socket.id];
+    delete app.locals.socketRoomMap[socket.id];
+    const usernameIndex = app.locals.usersInRoom[roomId]?.findIndex(
+      (user: { socketId: string; username: string }) =>
+        user.socketId === socket.id
     );
     if (usernameIndex !== -1) {
-      usersInRoom[roomId]?.splice(usernameIndex, 1);
-      io.to(roomId).emit("userList", usersInRoom[roomId]);
+      app.locals.usersInRoom[roomId]?.splice(usernameIndex, 1);
+      io.to(roomId).emit("players", app.locals.usersInRoom[roomId]);
     }
   });
 });
