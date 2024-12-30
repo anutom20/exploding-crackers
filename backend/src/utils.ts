@@ -89,12 +89,12 @@ export const updateGameState = (
     case "attack":
       gameState.lastPlayedCard = "attack";
       gameState.currentPlayerRepeatedTurns++;
+      removeCardFromHand(gameState, gameState.currentPlayerTurn, "attack");
       gameState.currentPlayerTurn = getNextPlayer(
         gameState.currentPlayerTurn,
         playerUsernames,
         gameState.gameDirection
       );
-      removeCardFromHand(gameState, gameState.currentPlayerTurn, "attack");
       return gameState;
     case "shuffle":
       gameState.lastPlayedCard = "shuffle";
