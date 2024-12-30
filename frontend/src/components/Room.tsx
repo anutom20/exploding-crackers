@@ -25,7 +25,7 @@ function Room() {
     { username: string; socketId: string }[]
   >([]);
 
-  const [currentPlayerMove, setCurrentPlayerMove] = useState<string>("");
+  const [, setCurrentPlayerMove] = useState<string>("");
 
   const [gameState, setGameState] = useState<any>(null);
 
