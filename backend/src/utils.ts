@@ -1,3 +1,16 @@
+export interface GameState {
+  showFutureCurrentPlayer: boolean;
+  lastPlayedCard: string;
+  currentPlayerTurn: string;
+  currentPlayerRepeatedTurns: number;
+  gameDirection: "clockwise" | "counterclockwise";
+  explosionCardAtCurrentPlayer: boolean;
+  deck: string[];
+  gameCompleted?: boolean;
+  playerHands: { [username: string]: string[] };
+  playersInGame: string[];
+}
+
 const normalCardTypes = [
   "skip",
   "reverse",
@@ -6,6 +19,7 @@ const normalCardTypes = [
   "favor",
   "shuffle",
 ];
+
 function shuffle(array: any[]) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -13,6 +27,7 @@ function shuffle(array: any[]) {
   }
   return array;
 }
+
 export function createDeck(numPlayers: number) {
   const deck: any[] = [];
   const totalCards = numPlayers * 4;
@@ -24,6 +39,7 @@ export function createDeck(numPlayers: number) {
   shuffle(deck);
   return deck;
 }
+
 export function distributeCards(
   deck: any[],
   numPlayers: number,
@@ -61,8 +77,9 @@ export function distributeCards(
   shuffle(deck);
   return [deck, playerHands];
 }
+
 export const updateGameState = (
-  gameState: any,
+  gameState: GameState,
   currentPlayerMove: string,
   playerUsernames: string[],
   favorFromUsername?: string,
@@ -162,8 +179,9 @@ export const updateGameState = (
   );
   return gameState;
 };
+
 const removeCardFromHand = (
-  gameState: any,
+  gameState: GameState,
   player: string,
   cardType: string
 ) => {
@@ -173,7 +191,8 @@ const removeCardFromHand = (
     hand.splice(cardIndex, 1); // Remove one card of the specified type
   }
 };
-const getNextPlayer = (
+
+export const getNextPlayer = (
   currentTurn: string,
   playerUsernames: string[],
   gameDirection: "clockwise" | "counterclockwise"
@@ -185,6 +204,7 @@ const getNextPlayer = (
         (currentIndex - 1 + playerUsernames.length) % playerUsernames.length
       ];
 };
+
 const getPreviousPlayer = (
   currentTurn: string,
   playerUsernames: string[],
@@ -197,8 +217,9 @@ const getPreviousPlayer = (
       ]
     : playerUsernames[(currentIndex + 1) % playerUsernames.length];
 };
+
 const transferCard = (
-  gameState: any,
+  gameState: GameState,
   fromUsername: string,
   playerUsernames: string[]
 ) => {

@@ -4,8 +4,10 @@ import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import routes from "./routes/routes";
-import { updateGameState } from "./utils";
+import { getNextPlayer, updateGameState } from "./utils";
 import { startGame } from "./startGame";
+import errorHandler from "./middleware/errorHandler";
+import { GameState } from "./utils"; // Importing GameState interface
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,13 +18,15 @@ app.use(bodyParser.json());
 app.locals.usersInRoom = {};
 app.locals.gameHosts = {};
 app.locals.socketRoomMap = {};
-app.locals.gameState = {};
+app.locals.gameState = {} as { [roomId: string]: GameState }; // Using GameState interface
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Exploding bombs game server!");
 });
 
 app.use("/api", routes);
+
+app.use(errorHandler);
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -35,6 +39,10 @@ const io = new Server(httpServer, {
 io.on("connection", (socket) => {
   socket.on("joinRoom", (roomData) => {
     console.log("roomData", app.locals.usersInRoom[roomData.roomId]);
+    if (app.locals.gameState[roomData.roomId]) {
+      socket.emit("error", "You cannot join this room , game already started");
+      return;
+    }
     if (
       app.locals.usersInRoom[roomData.roomId] &&
       app.locals.usersInRoom[roomData.roomId].find(
@@ -121,8 +129,33 @@ io.on("connection", (socket) => {
         user.socketId === socket.id
     );
     if (usernameIndex !== -1) {
+      const username =
+        app.locals.usersInRoom[roomId]?.[usernameIndex]?.username;
       app.locals.usersInRoom[roomId]?.splice(usernameIndex, 1);
-      io.to(roomId).emit("players", app.locals.usersInRoom[roomId]);
+
+      if (app.locals.gameState[roomId]) {
+        // Remove playerHands from gameState for the disconnected player
+        const gameState = app.locals.gameState[roomId];
+        if (gameState?.playerHands[username]) {
+          delete gameState.playerHands[username];
+        }
+        gameState.playersInGame = gameState?.playersInGame?.filter(
+          (player: string) => player !== username
+        );
+        const explosionCardIndex = gameState?.deck?.indexOf("explosion");
+        if (explosionCardIndex !== -1) {
+          gameState?.deck?.splice(explosionCardIndex, 1);
+        }
+        gameState.currentPlayerTurn = getNextPlayer(
+          gameState?.currentPlayerTurn,
+          app.locals.usersInRoom[roomId]?.map(
+            (user: { username: string }) => user.username
+          ),
+          gameState?.gameDirection
+        );
+        io.to(roomId).emit("players", app.locals.usersInRoom[roomId]);
+        io.to(roomId).emit("gameStateUpdate", gameState);
+      }
     }
   });
 });
