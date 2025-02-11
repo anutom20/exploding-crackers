@@ -43,7 +43,7 @@ function CreateRoom() {
           Pop! Crackle! Let the firecrackers fly!
         </h1>
         <p className="text-lg text-white mb-6">
-          Join the very fun Exploding Kittens game and experience thrilling
+          Join the very fun Exploding Chickens game and experience thrilling
           matches!
         </p>
         <input
@@ -65,7 +65,7 @@ function CreateRoom() {
         <div className="transform rotate-3 overflow-hidden shadow-lg rounded-lg w-4/5 h-auto">
           <img
             src={Background}
-            alt="Exploding Kittens"
+            alt="Exploding Chickens"
             className="object-contain"
           />
         </div>

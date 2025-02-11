@@ -38,10 +38,11 @@ const Card = ({
 
   return (
     <div
-      className={`border-4 h-full bg-white rounded-2xl shadow-lg flex flex-col flex-shrink-0 items-center w-inherit`}
+      className={`border-4 h-full ${
+        cardName === "explosion" ? "bg-gray-800" : "bg-white"
+      } rounded-2xl shadow-lg flex flex-col flex-shrink-0 items-center w-inherit`}
       style={{
         borderColor: borderColor,
-        backgroundColor: cardName === "explosion" ? "#FFBD4A" : "white",
       }}
     >
       <div className="p-2">

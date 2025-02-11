@@ -13,6 +13,7 @@ import Favor from "/cards/favor.png";
 import SeeTheFuture from "/cards/future.png";
 import { FiPlus } from "react-icons/fi";
 import Card from "./Card";
+import { PiClockCountdownBold } from "react-icons/pi";
 
 const GameLayout = ({
   playerHands,
@@ -20,7 +21,10 @@ const GameLayout = ({
   currentPlayerTurn,
   playersInGame,
   lastPlayedCard,
+  countdownGoing,
+  loseCountdown,
   players,
+  noOfCardsEachPlayer,
 }: {
   playerHands: string[];
   onCardClick: (card: string) => void;
@@ -28,8 +32,13 @@ const GameLayout = ({
   lastPlayedCard: string;
   playersInGame: string[];
   players: { username: string; socketId: string }[];
+  countdownGoing: boolean;
+  loseCountdown: number;
+  noOfCardsEachPlayer: { username: string; noOfCards: number }[];
 }) => {
   console.log("players", players);
+
+  console.log("lastPlayedCard", lastPlayedCard);
 
   const cardImagesMap = {
     attack: Attack,
@@ -66,10 +75,23 @@ const GameLayout = ({
                 />
               </div>
               <span>{player.username}</span>
+              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">
+                {playersInGame.includes(player.username)
+                  ? noOfCardsEachPlayer.find(
+                      (item) => item.username === player.username
+                    )?.noOfCards
+                  : 0}
+              </div>
             </div>
           ))}
         </div>
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+          {countdownGoing && (
+            <h4 className="text-red-600 font-bold flex items-center gap-2">
+              <PiClockCountdownBold className="text-2xl" /> Lose Countdown:{" "}
+              {loseCountdown}
+            </h4>
+          )}
           <div
             className="flex flex-col items-center justify-center space-y-2 bg-gray-800 text-white p-3 rounded-xl w-full sm:w-28 md:w-36 lg:w-48 xl:w-56 h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-300"
             onClick={() => onCardClick("draw")}
@@ -79,22 +101,33 @@ const GameLayout = ({
           </div>
           <div
             className={`flex flex-col items-center justify-center space-y-2 bg-gray-800 text-white p-3 rounded-xl w-full sm:w-28 md:w-36 lg:w-48 xl:w-56 ${
-              lastPlayedCard !== "None"
+              lastPlayedCard !== "None" &&
+              lastPlayedCard !== "Card drawn from deck"
                 ? "h-auto"
                 : "h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72"
             }   hover:shadow-md hover:scale-105 transition-all duration-300 ${
-              lastPlayedCard !== "None" ? "bg-white" : "bg-gray-800"
+              lastPlayedCard !== "None" &&
+              lastPlayedCard !== "Card drawn from deck"
+                ? "bg-white"
+                : "bg-gray-800"
             }`}
           >
-            {lastPlayedCard !== "None" ? (
-              <Card
-                cardName={lastPlayedCard}
-                imageSrc={
-                  cardImagesMap[lastPlayedCard as keyof typeof cardImagesMap]
-                }
-              />
+            {lastPlayedCard !== "None" &&
+            lastPlayedCard !== "Card drawn from deck" ? (
+              <div className="flex flex-col items-center justify-center space-y-2 bg-white text-white p-2 rounded-xl w-full sm:w-28 md:w-36 lg:w-48 xl:w-56 h-auto">
+                <Card
+                  cardName={lastPlayedCard}
+                  imageSrc={
+                    cardImagesMap[lastPlayedCard as keyof typeof cardImagesMap]
+                  }
+                />
+              </div>
             ) : (
-              <h2 className="text-xl">Discard Pile</h2>
+              <h2 className="text-xl">
+                {lastPlayedCard === "None"
+                  ? "Discard Pile"
+                  : "Card drawn from deck"}
+              </h2>
             )}
           </div>
         </div>

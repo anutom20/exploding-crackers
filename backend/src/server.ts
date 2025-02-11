@@ -21,7 +21,7 @@ app.locals.socketRoomMap = {};
 app.locals.gameState = {} as { [roomId: string]: GameState }; // Using GameState interface
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Exploding kittens game server!");
+  res.send("Exploding chickens game server!");
 });
 
 app.use("/api", routes);

@@ -6,21 +6,19 @@ import Header from "./Header";
 import UserImage from "../../public/user_image.png";
 import { IoCopyOutline } from "react-icons/io5";
 import Spinner from "./Spinner";
-type MoveType =
-  | "defuse"
-  | "favor"
-  | "explosion"
-  | "skip"
-  | "reverse"
-  | "attack"
-  | "future"
-  | "shuffle";
+import { useSnackbar } from "notistack";
+import SeeTheFuture from "./SeeTheFuture";
+import ExplosionCardPlacement from "./ExplosionCardPlacement";
+import ChooseFavor from "./ChooseFavor";
+import { MoveType } from "../types";
 
 function Room() {
   const { roomId } = useParams();
   const { username: usernameFromState } = useLocation().state || "";
-
+  const { enqueueSnackbar } = useSnackbar();
   const [username, setUsername] = useState(usernameFromState ?? "");
+
+  const [seeTheFutureOpen, setSeeTheFutureOpen] = useState(false);
 
   console.log("username", username);
 
@@ -28,9 +26,23 @@ function Room() {
     { username: string; socketId: string }[]
   >([]);
 
+  const [noOfCardsEachPlayer, setNoOfCardsEachPlayer] = useState<
+    {
+      username: string;
+      noOfCards: number;
+    }[]
+  >([]);
+
   const [, setCurrentPlayerMove] = useState<string>("");
 
   const [gameState, setGameState] = useState<any>(null);
+
+  const [, setExplosionCardPlacement] = useState<"top" | "random" | null>(null);
+
+  const [chooseFavorOpen, setChooseFavorOpen] = useState(false);
+
+  const [explosionCardPlacementOpen, setExplosionCardPlacementOpen] =
+    useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -64,8 +76,28 @@ function Room() {
         alert("Game completed , winner is " + gameState.playersInGame[0]);
         return;
       }
+
+      if (gameState?.playerHands) {
+        setNoOfCardsEachPlayer(
+          Object.keys(gameState.playerHands).map((username) => ({
+            username,
+            noOfCards: gameState?.playerHands[username]?.length,
+          }))
+        );
+      }
       if (gameState.explosionCardAtCurrentPlayer) {
         setCountdownGoing(true);
+        enqueueSnackbar(
+          "Lose countdown started! , immediately play defuse card to avoid explosion",
+          {
+            variant: "info",
+            anchorOrigin: {
+              vertical: "top",
+              horizontal: "center",
+            },
+            autoHideDuration: 5000,
+          }
+        );
         setLoseCountdown(import.meta.env.VITE_LOSE_COUNTDOWN);
       }
       setGameState(gameState);
@@ -127,7 +159,12 @@ function Room() {
     });
   };
 
-  const makeMove = (move: MoveType) => {
+  const makeMove = (
+    move: MoveType,
+    placeExplosionCardInMiddle?: boolean,
+    favorFromUsername?: string
+  ) => {
+    console.log("makeMove", move, placeExplosionCardInMiddle);
     if (gameState?.currentPlayerTurn === username) {
       if (gameState?.explosionCardAtCurrentPlayer && move !== "defuse") {
         alert(
@@ -141,17 +178,14 @@ function Room() {
           roomId,
           currentPlayerMove: move,
           playerUsernames: gameState.playersInGame,
-          placeExplosionCardInMiddle: true,
+          placeExplosionCardInMiddle: placeExplosionCardInMiddle ?? false,
         });
-        return;
       } else if (move === "favor") {
         socket.emit("updateGameState", {
           roomId,
           currentPlayerMove: move,
           playerUsernames: gameState.playersInGame,
-          favorFromUsername: players.find(
-            (player) => player.username !== gameState.currentPlayerTurn
-          )?.username,
+          favorFromUsername: favorFromUsername,
         });
       } else {
         socket.emit("updateGameState", {
@@ -161,7 +195,14 @@ function Room() {
         });
       }
     } else {
-      alert("Not your turn");
+      enqueueSnackbar("Not your turn", {
+        variant: "warning",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "center",
+        },
+        autoHideDuration: 2000,
+      });
     }
   };
 
@@ -170,93 +211,140 @@ function Room() {
   }
 
   return (
-    <div className="h-screen">
-      <div className="sticky top-0 z-10">
-        <Header currentUser={username} />
-      </div>
-      {!gameState && currentPlayerJoined && (
-        <div className="rounded-lg my-8 mx-4 p-4 border-2 border-orange-500 w-fit">
-          <h3 className="text-xl font-bold text-gray-800 mb-6">
-            Players in the Room
-          </h3>
-          <ul className="list-none space-y-2">
-            {players.map((player) => (
-              <li key={player.socketId} className="bg-white p-4">
-                <img
-                  src={UserImage}
-                  alt="User"
-                  className="w-10 h-10 rounded-full border-2 border-gray-300"
-                />
-                <span className="text-gray-700 text-md">{player.username}</span>
-              </li>
-            ))}
-          </ul>
-          {hostUsername === usernameFromState && !gameState && (
-            <button
-              onClick={startGame}
-              className="bg-orange-500 text-white p-3 rounded-lg hover:bg-orange-600 transition transform hover:scale-105"
-            >
-              Start Game
-            </button>
-          )}
+    <>
+      <div className="h-screen">
+        <div className="sticky top-0 z-10">
+          <Header
+            currentUser={username}
+            currentPlayerTurn={gameState?.currentPlayerTurn}
+          />
         </div>
-      )}
-      {countdownGoing && (
-        <h4 className="text-red-600 font-bold">
-          ⏰ Lose Countdown: {loseCountdown}
-        </h4>
-      )}
-      {gameState && (
-        <GameLayout
-          players={players}
-          playersInGame={gameState?.playersInGame}
-          lastPlayedCard={gameState?.lastPlayedCard}
-          playerHands={gameState?.playerHands[username]}
-          onCardClick={(move: string) => {
-            setCurrentPlayerMove(move);
-            makeMove(move as MoveType);
-          }}
-          currentPlayerTurn={gameState?.currentPlayerTurn}
+        {!gameState && currentPlayerJoined && (
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="rounded-lg my-8 mx-4 p-8 border-8 border-dotted border-light-gray w-fit font-bold">
+              <h3 className="text-xl font-bold text-gray-800 mb-6">
+                Players in the Room
+              </h3>
+              <ul className="list-none space-y-2">
+                {players.map((player) => (
+                  <li key={player.socketId} className="bg-white p-4">
+                    <img
+                      src={UserImage}
+                      alt="User"
+                      className="w-10 h-10 rounded-full border-2 border-gray-300"
+                    />
+                    <span className="text-gray-700 text-md">
+                      {player.username}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex flex-col w-fit">
+              {hostUsername === usernameFromState && !gameState && (
+                <button
+                  onClick={startGame}
+                  className="bg-orange-500 text-white p-3 rounded-lg hover:bg-orange-600 transition transform hover:scale-105"
+                >
+                  Start Game
+                </button>
+              )}
+              {!gameState && (
+                <div className="p-4 rounded-lg mt-4">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        `${window.location.origin}/room/${roomId}`
+                      );
+                      enqueueSnackbar("Link copied to clipboard!", {
+                        variant: "success",
+                        anchorOrigin: {
+                          vertical: "top",
+                          horizontal: "center",
+                        },
+                        autoHideDuration: 2000,
+                      });
+                    }}
+                    className="flex items-center gap-2 bg-orange-500 text-white p-3 rounded-lg hover:bg-orange-600 transition transform hover:scale-105"
+                  >
+                    <IoCopyOutline className="text-2xl" />{" "}
+                    <span>Invite Link</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {gameState && (
+          <GameLayout
+            countdownGoing={countdownGoing}
+            loseCountdown={loseCountdown}
+            players={players}
+            playersInGame={gameState?.playersInGame}
+            noOfCardsEachPlayer={noOfCardsEachPlayer}
+            lastPlayedCard={gameState?.lastPlayedCard}
+            playerHands={gameState?.playerHands[username]}
+            onCardClick={(move: string) => {
+              if (move === "future") {
+                setSeeTheFutureOpen(true);
+              } else if (
+                move === "defuse" &&
+                gameState?.explosionCardAtCurrentPlayer
+              ) {
+                setExplosionCardPlacementOpen(true);
+                return;
+              } else if (move === "favor") {
+                setChooseFavorOpen(true);
+                return;
+              }
+              setCurrentPlayerMove(move);
+              makeMove(move as MoveType);
+            }}
+            currentPlayerTurn={gameState?.currentPlayerTurn}
+          />
+        )}
+
+        <>
+          {!currentPlayerJoined && (
+            <div className="mb-4 flex flex-col space-y-4 p-4">
+              <input
+                type="text"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-fit border-2 border-orange-500 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+              />
+              <button
+                onClick={joinRoom}
+                className="w-fit mt-2 bg-orange-500 text-white p-3 rounded-lg hover:bg-orange-600 transition transform hover:scale-105"
+              >
+                Join Room
+              </button>
+            </div>
+          )}
+        </>
+      </div>
+      {seeTheFutureOpen && gameState?.currentPlayerTurn === username && (
+        <SeeTheFuture
+          setOpen={setSeeTheFutureOpen}
+          top3Cards={gameState?.deck?.slice(-3)}
         />
       )}
-
-      <>
-        {!currentPlayerJoined && (
-          <div className="mb-4 flex flex-col space-y-4 p-4">
-            <input
-              type="text"
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-fit border-2 border-orange-500 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
-            />
-            <button
-              onClick={joinRoom}
-              className="w-fit mt-2 bg-orange-500 text-white p-3 rounded-lg hover:bg-orange-600 transition transform hover:scale-105"
-            >
-              Join Room
-            </button>
-          </div>
-        )}
-
-        {!gameState && (
-          <div className="p-4 rounded-lg mt-4">
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(
-                  `${window.location.origin}/room/${roomId}`
-                );
-                alert("Link copied to clipboard!");
-              }}
-              className="flex items-center gap-2 text-orange-600 underline text-lg mt-2 hover:text-orange-800 transition"
-            >
-              <IoCopyOutline className="text-2xl" />{" "}
-              <span>Copy Invite Link</span>
-            </button>
-          </div>
-        )}
-      </>
-    </div>
+      {explosionCardPlacementOpen && (
+        <ExplosionCardPlacement
+          makeMove={makeMove}
+          setOpen={setExplosionCardPlacementOpen}
+          setExplosionCardPlacement={setExplosionCardPlacement}
+        />
+      )}
+      {chooseFavorOpen && gameState?.currentPlayerTurn === username && (
+        <ChooseFavor
+          playersInGame={gameState?.playersInGame}
+          setOpen={setChooseFavorOpen}
+          makeMove={makeMove}
+        />
+      )}
+    </>
   );
 }
 
