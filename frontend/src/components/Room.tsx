@@ -221,7 +221,7 @@ function Room() {
 
   return (
     <>
-      <div className="h-screen">
+      <div className="h-screen bg-white">
         <div className="sticky top-0 z-10">
           <Header
             currentUser={username}

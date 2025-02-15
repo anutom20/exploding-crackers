@@ -133,7 +133,7 @@ const GameLayout = ({
         </div>
         <h1 className="text-xl text-gray-700 font-bold">Your cards</h1>
         <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 w-full px-16 mt-8 relative">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto bg-white">
             <button
               className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white border-2 border-orange-500 text-orange-500 p-2 rounded-full z-10"
               onClick={() => {
