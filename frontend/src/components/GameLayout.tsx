@@ -31,7 +31,7 @@ const GameLayout = ({
   currentPlayerTurn: string;
   lastPlayedCard: string;
   playersInGame: string[];
-  players: { username: string; socketId: string }[];
+  players: { username: string; socketId: string; avatar: string }[];
   countdownGoing: boolean;
   loseCountdown: number;
   noOfCardsEachPlayer: { username: string; noOfCards: number }[];
@@ -69,7 +69,7 @@ const GameLayout = ({
               )}
               <div className="relative">
                 <img
-                  src={userImage}
+                  src={player.avatar}
                   alt="Player Icon"
                   className="w-12 h-12 rounded-full shadow-md z-10"
                 />

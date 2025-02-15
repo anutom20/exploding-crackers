@@ -11,19 +11,20 @@ import SeeTheFuture from "./SeeTheFuture";
 import ExplosionCardPlacement from "./ExplosionCardPlacement";
 import ChooseFavor from "./ChooseFavor";
 import { MoveType } from "../types";
-
+import Winner from "./Winner";
+import ChooseAvatar from "./ChooseAvatar";
 function Room() {
   const { roomId } = useParams();
   const { username: usernameFromState } = useLocation().state || "";
   const { enqueueSnackbar } = useSnackbar();
   const [username, setUsername] = useState(usernameFromState ?? "");
-
+  const [avatar, setAvatar] = useState("");
   const [seeTheFutureOpen, setSeeTheFutureOpen] = useState(false);
 
   console.log("username", username);
 
   const [players, setPlayers] = useState<
-    { username: string; socketId: string }[]
+    { username: string; socketId: string; avatar: string }[]
   >([]);
 
   const [noOfCardsEachPlayer, setNoOfCardsEachPlayer] = useState<
@@ -40,6 +41,8 @@ function Room() {
   const [, setExplosionCardPlacement] = useState<"top" | "random" | null>(null);
 
   const [chooseFavorOpen, setChooseFavorOpen] = useState(false);
+
+  const [chooseAvatarOpen, setChooseAvatarOpen] = useState(false);
 
   const [explosionCardPlacementOpen, setExplosionCardPlacementOpen] =
     useState(false);
@@ -59,6 +62,8 @@ function Room() {
 
   const [hostUsername, setHostUsername] = useState<string>("");
 
+  const [showWinner, setShowWinner] = useState(false);
+
   useEffect(() => {
     if (gameState?.playersInGame?.length === 1 && !gameState?.gameCompleted) {
       socket.emit("gameCompleted", roomId);
@@ -73,7 +78,7 @@ function Room() {
     socket.on("gameStateUpdate", (gameState) => {
       console.log("Game state updated:", gameState);
       if (gameState.gameCompleted) {
-        alert("Game completed , winner is " + gameState.playersInGame[0]);
+        setShowWinner(true);
         return;
       }
 
@@ -87,17 +92,19 @@ function Room() {
       }
       if (gameState.explosionCardAtCurrentPlayer) {
         setCountdownGoing(true);
-        enqueueSnackbar(
-          "Lose countdown started! , immediately play defuse card to avoid explosion",
-          {
-            variant: "info",
-            anchorOrigin: {
-              vertical: "top",
-              horizontal: "center",
-            },
-            autoHideDuration: 5000,
-          }
-        );
+        if (gameState.currentPlayerTurn === username) {
+          enqueueSnackbar(
+            "Lose countdown started! , immediately play defuse card to avoid explosion",
+            {
+              variant: "info",
+              anchorOrigin: {
+                vertical: "top",
+                horizontal: "center",
+              },
+              autoHideDuration: 5000,
+            }
+          );
+        }
         setLoseCountdown(import.meta.env.VITE_LOSE_COUNTDOWN);
       }
       setGameState(gameState);
@@ -148,8 +155,8 @@ function Room() {
     }, 1000);
   }, []);
 
-  const joinRoom = () => {
-    socket.emit("joinRoom", { roomId, username });
+  const joinRoom = (avatar: string) => {
+    socket.emit("joinRoom", { roomId, username, avatar });
   };
 
   const startGame = async () => {
@@ -210,6 +217,8 @@ function Room() {
     return <Spinner />;
   }
 
+  console.log("players", players);
+
   return (
     <>
       <div className="h-screen">
@@ -219,6 +228,7 @@ function Room() {
             currentPlayerTurn={gameState?.currentPlayerTurn}
           />
         </div>
+
         {!gameState && currentPlayerJoined && (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="rounded-lg my-8 mx-4 p-8 border-8 border-dotted border-light-gray w-fit font-bold">
@@ -229,7 +239,7 @@ function Room() {
                 {players.map((player) => (
                   <li key={player.socketId} className="bg-white p-4">
                     <img
-                      src={UserImage}
+                      src={player.avatar}
                       alt="User"
                       className="w-10 h-10 rounded-full border-2 border-gray-300"
                     />
@@ -270,6 +280,15 @@ function Room() {
                     <IoCopyOutline className="text-2xl" />{" "}
                     <span>Invite Link</span>
                   </button>
+                  {username !== hostUsername ? (
+                    <span className="text-gray-600 italic py-2">
+                      Waiting for host to start game
+                    </span>
+                  ) : (
+                    <span className="text-gray-600 italic py-2">
+                      Waiting for other players to join
+                    </span>
+                  )}
                 </div>
               )}
             </div>
@@ -315,7 +334,9 @@ function Room() {
                 className="w-fit border-2 border-orange-500 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
               />
               <button
-                onClick={joinRoom}
+                onClick={() => {
+                  setChooseAvatarOpen(true);
+                }}
                 className="w-fit mt-2 bg-orange-500 text-white p-3 rounded-lg hover:bg-orange-600 transition transform hover:scale-105"
               >
                 Join Room
@@ -339,9 +360,28 @@ function Room() {
       )}
       {chooseFavorOpen && gameState?.currentPlayerTurn === username && (
         <ChooseFavor
+          players={players}
+          username={username}
           playersInGame={gameState?.playersInGame}
           setOpen={setChooseFavorOpen}
           makeMove={makeMove}
+        />
+      )}
+      {showWinner && (
+        <Winner
+          hostUsername={hostUsername}
+          username={username}
+          winner={gameState?.playersInGame[0]}
+          setOpen={setShowWinner}
+          roomId={roomId ?? ""}
+          players={players}
+        />
+      )}
+      {chooseAvatarOpen && (
+        <ChooseAvatar
+          setOpen={setChooseAvatarOpen}
+          setAvatar={setAvatar}
+          joinRoom={joinRoom}
         />
       )}
     </>

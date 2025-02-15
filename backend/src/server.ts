@@ -62,6 +62,7 @@ io.on("connection", (socket) => {
     app.locals.usersInRoom[roomData.roomId].push({
       username: roomData.username,
       socketId: socket.id,
+      avatar: roomData.avatar,
     });
 
     if (roomData.host) {
@@ -93,6 +94,7 @@ io.on("connection", (socket) => {
 
   socket.on("startGame", (gameInput) => {
     startGame(gameInput, app, socket, io);
+    io.to(gameInput.roomId).emit("gameStarted");
   });
 
   socket.on("stopCountdownRequest", (roomId) => {
