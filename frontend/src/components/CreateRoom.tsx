@@ -24,7 +24,7 @@ const howToPLayInfo = [
   {
     title: "Understanding the basics",
     description:
-      "Exploding Chickens is a card game based on both luck and strategy. Throughout the game, you draw cards from the deck which can either secure your victory or lead to your explosive demise. Action cards help give you an advantage over your opponents. But beware: the deadly Exploding Chicken is also hidden in the mix.",
+      "Exploding Chickens is a card game that combines elements of luck and strategy. As you play, you'll draw cards from the deck that can either lead you to victory or result in your explosive downfall. Action cards provide you with an edge over your rivals. However, be cautious: the treacherous Exploding Chicken is lurking in the deck.",
     cards: [
       { cardName: "defuse", imageSrc: defuse },
       { cardName: "skip", imageSrc: skip },
@@ -34,7 +34,7 @@ const howToPLayInfo = [
   {
     title: "Taking your Turn",
     description:
-      "At the start of your turn, you can play as many (or as few) action cards as you’d like. That is, as long as the circumstances permit. Some unique cards will allow you to skip your turn entirely while others can force you to draw multiple times. Just follow the cards instructions below on how to play each action card. End your turn by drawing a card from the deck.",
+      "At the beginning of your turn, you have the freedom to play as many action cards as you wish, or none at all, depending on the situation. Certain special cards may allow you to completely skip your turn, while others might require you to draw multiple cards. Just adhere to the instructions on the cards below for guidance on how to utilize each action card. Conclude your turn by drawing a card from the deck.",
     cards: [
       { cardName: "attack", imageSrc: attack },
       { cardName: "favor", imageSrc: favor },
@@ -44,13 +44,13 @@ const howToPLayInfo = [
   {
     title: "Drawing an Exploding Chicken",
     description:
-      "When you continue drawing card after card in the game, there comes a point where someone will draw an Exploding Chicken. If that’s you, you have two options: defuse the ticking time bomb or say goodbye to your chances of winning. The number of Exploding Chickens is always one less than the number of players alive.",
+      "As you keep drawing cards throughout the game, there will inevitably come a moment when someone draws an Exploding Chicken. If that unfortunate player is you, you have two choices: defuse the ticking time bomb or forfeit your chances of winning. The total number of Exploding Chickens is always one less than the number of players still in the game.",
     cards: [{ cardName: "explosion", imageSrc: explosion }],
   },
   {
     title: "Winner Winner Chicken Dinner!",
     description:
-      "Winning the game is pretty simple. Use whatever cards at your disposal, combined with your smarts, to be the last person alive. After you witness each of your friends fall one by one to the wrath of the Exploding Chicken, congratulations! You’ve claimed the bragging rights to one of the most explosive games on the planet. Don’t let them forget.",
+      "Winning the game is quite straightforward. Utilize any cards at your disposal, along with your cleverness, to be the last player standing. After watching your friends fall one by one to the might of the Exploding Chicken, congratulations! You’ve earned the bragging rights to one of the most explosive games on the planet. Make sure they remember it.",
     cards: [
       { cardName: "shuffle", imageSrc: shuffle },
       { cardName: "reverse", imageSrc: reverse },
@@ -63,49 +63,49 @@ const cardDescriptions = [
     cardName: "shuffle",
     imageSrc: shuffle,
     description:
-      "Shuffles the deck to hopefully decrease your odds at drawing an Exploding Chicken. Plain and simple. Does not count as a turn.",
+      "Shuffles the deck in hopes of lowering your chances of drawing an Exploding Chicken. It's straightforward and does not count as a turn.",
   },
   {
     cardName: "reverse",
     imageSrc: reverse,
     description:
-      "Skips your turn and reverses the turn direction, all without having to draw a card. If you are stuck with multiple turns, the reverse card only removes one turn.",
+      "Bypasses your turn and changes the direction of play, all without needing to draw a card. If you have multiple turns, the reverse card only cancels one of them.",
   },
   {
     cardName: "explosion",
     imageSrc: explosion,
     description:
-      "Avoid this little guy at all costs. Once this card is drawn, you must use a defuse card to stop the ticking time bomb. If you don't have a defuse card, it looks like your time is up.",
+      "Steer clear of this card at all costs. Once drawn, you must play a defuse card to neutralize the ticking time bomb. If you lack a defuse card, it seems your time has run out.",
   },
   {
     cardName: "defuse",
     imageSrc: defuse,
     description:
-      "Clip the wires and stop the Exploding Chicken from exploding. Once defused, the player puts the Exploding Chicken back in the deck wherever they'd like.",
+      "Cut the wires to prevent the Exploding Chicken from detonating. After defusing, the player can place the Exploding Chicken back into the deck wherever they choose.",
   },
   {
     cardName: "attack",
     imageSrc: attack,
     description:
-      "Seek vengeance on your friends by forcing the next player in line to take 2 turns. Attack cards can be stacked to force the next player to take 4, 6, and even 8+ turns.",
+      "Exact your revenge on your friends by compelling the next player to take 2 turns. Attack cards can be combined to make the next player take 4, 6, or even more turns.",
   },
   {
     cardName: "favor",
     imageSrc: favor,
     description:
-      "Allows you to ask for a favor (aka steal a card) from anyone still in the game. Your target really can't do much about it. Does not count as a turn.",
+      "Enables you to request a favor (essentially steal a card) from any player still in the game. Your target has little recourse. This action does not count as a turn.",
   },
   {
     cardName: "future",
     imageSrc: future,
     description:
-      "Allow yourself to see the top three cards in the deck. Be quick though, because you only have 5 seconds. Does not count as a turn.",
+      "Grants you the ability to view the top three cards in the deck. Be swift, as you only have 5 seconds. This does not count as a turn.",
   },
   {
     cardName: "skip",
     imageSrc: skip,
     description:
-      "Effectively skips your turn without having to draw a card. If you are stuck with multiple turns, the skip card only removes one turn.",
+      "Allows you to skip your turn without needing to draw a card. If you have multiple turns, the skip card only eliminates one of them.",
   },
 ];
 
@@ -223,8 +223,8 @@ function CreateRoom() {
           Base Cards
         </h2>
         <p className="text-xl text-white">
-          These cards are the core of the game. They are the cards that you will
-          use to win the game.
+          These cards form the foundation of the game. They are the essential
+          cards you'll utilize to achieve victory.
         </p>
       </div>
       <div className="grid grid-cols-1 gap-12 md:grid-cols-2 xl:grid-cols-3">
