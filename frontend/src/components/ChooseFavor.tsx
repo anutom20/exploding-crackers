@@ -1,4 +1,3 @@
-import UserImage from "/user_image.png";
 import { MoveType } from "../types";
 
 const ChooseFavor = ({

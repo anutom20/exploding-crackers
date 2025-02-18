@@ -3,7 +3,6 @@ import { useLocation, useParams } from "react-router-dom";
 import { socket } from "../socket";
 import GameLayout from "./GameLayout";
 import Header from "./Header";
-import UserImage from "../../public/user_image.png";
 import { IoCopyOutline } from "react-icons/io5";
 import Spinner from "./Spinner";
 import { useSnackbar } from "notistack";
@@ -18,7 +17,7 @@ function Room() {
   const { username: usernameFromState } = useLocation().state || "";
   const { enqueueSnackbar } = useSnackbar();
   const [username, setUsername] = useState(usernameFromState ?? "");
-  const [avatar, setAvatar] = useState("");
+  const [, setAvatar] = useState("");
   const [seeTheFutureOpen, setSeeTheFutureOpen] = useState(false);
 
   console.log("username", username);

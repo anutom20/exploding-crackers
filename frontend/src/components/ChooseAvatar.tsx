@@ -1,4 +1,3 @@
-import React from "react";
 import dog from "/avatars/dog.png";
 import sloth from "/avatars/sloth.png";
 import fox from "/avatars/fox.png";

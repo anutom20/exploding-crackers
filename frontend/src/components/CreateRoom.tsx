@@ -18,7 +18,6 @@ import { FaLinkedinIn } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
 import { SiLeetcode } from "react-icons/si";
 import { SiGmail } from "react-icons/si";
-import { FaInstagram } from "react-icons/fa6";
 
 const howToPLayInfo = [
   {
@@ -113,7 +112,7 @@ function CreateRoom() {
   const [username, setUsername] = useState("");
   const [text, setText] = useState("");
   const [chooseAvatarOpen, setChooseAvatarOpen] = useState(false);
-  const [avatar, setAvatar] = useState("");
+  const [, setAvatar] = useState("");
 
   const navigate = useNavigate();
 
