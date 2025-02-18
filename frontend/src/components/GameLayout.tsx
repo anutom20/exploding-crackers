@@ -1,4 +1,3 @@
-import userImage from "/user_image.png";
 import { TiTick } from "react-icons/ti";
 import { FaSkullCrossbones } from "react-icons/fa6";
 import { GrPrevious } from "react-icons/gr";
