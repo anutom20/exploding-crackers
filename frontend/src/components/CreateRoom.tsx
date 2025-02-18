@@ -147,7 +147,7 @@ function CreateRoom() {
   return (
     <div className="min-h-screen bg-gradient-to-r from-black to-orange-800 px-12 py-24 font-semibold space-y-12">
       <div className="flex flex-row">
-        <div className="flex flex-col justify-center items-start space-y-8 w-1/2">
+        <div className="flex flex-col justify-center items-start space-y-8 w-full md:w-1/2">
           <h1 className="text-5xl font-bold text-white mb-2">
             Welcome to
             <span className="bg-gradient-to-r from-yellow-500 to-red-500 text-transparent bg-clip-text">
@@ -165,13 +165,13 @@ function CreateRoom() {
             A beautiful, online alternative to the popular Exploding Kittens
             card game (just with chickens)
           </p>
-          <div className="flex flex-row space-x-4">
+          <div className="flex flex-col md:flex-row space-x-4 space-y-4 md:space-y-0">
             <input
               type="text"
               placeholder="Enter username..."
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="border-2 border-gray-500 p-3 rounded-lg w-80 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
+              className="border-2 border-gray-500 p-3 rounded-lg w-fit text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
             />
             <button
               onClick={() => {
@@ -184,7 +184,7 @@ function CreateRoom() {
           </div>
           <p className="text-center text-white">{text}</p>
         </div>
-        <div className="w-1/2 flex justify-center items-center">
+        <div className="hidden md:flex w-1/2 justify-center items-center">
           <div className="transform rotate-3 overflow-hidden shadow-lg rounded-lg w-4/5 h-auto transition-transform duration-700 hover:scale-105 hover:rotate-6">
             <img
               src={Background}
@@ -307,7 +307,7 @@ const HowToPlay = ({
     <div className="flex flex-row mt-8">
       {order === 0 && (
         <>
-          <div className="flex flex-row justify-center items-start space-x-4 w-1/2">
+          <div className="flex flex-row justify-center items-start space-x-4 w-full md:w-1/2">
             <span className="text-5xl font-bold bg-gradient-to-r from-yellow-500 to-red-500 text-transparent bg-clip-text">
               {num + 1}
             </span>
@@ -318,7 +318,7 @@ const HowToPlay = ({
               <p className="text-lg text-gray-400">{info.description}</p>
             </div>
           </div>
-          <div className="w-1/2 flex justify-center items-center">
+          <div className="hidden md:flex w-1/2 justify-center items-center">
             <div className="flex -space-x-4">
               {info.cards.map((card: any, index: number) => (
                 <div
@@ -336,7 +336,7 @@ const HowToPlay = ({
       )}
       {order === 1 && (
         <>
-          <div className="w-1/2 flex justify-center items-center">
+          <div className="hidden md:flex w-1/2 justify-center items-center">
             <div className="flex -space-x-4">
               {info.cards.map((card: any, index: number) => (
                 <div
@@ -350,7 +350,7 @@ const HowToPlay = ({
               ))}
             </div>
           </div>
-          <div className="flex flex-row justify-center items-start space-x-4 w-1/2">
+          <div className="flex flex-row justify-center items-start space-x-4 w-full md:w-1/2">
             <span className="text-5xl font-bold bg-gradient-to-r from-yellow-500 to-red-500 text-transparent bg-clip-text">
               {num + 1}
             </span>
@@ -377,9 +377,9 @@ const CardDescription = ({
   description: string;
 }) => {
   return (
-    <div className="flex flex-row justify-center space-x-4">
+    <div className="flex flex-col sm:flex-row justify-center space-x-4 space-y-4 md:space-y-0">
       <div
-        className={`flex flex-col items-center justify-center bg-white min-w-28 md:min-w-28 lg:min-w-36 xl:min-w-48 p-2 rounded-xl h-auto transition-transform duration-300 ease-in-out hover:scale-105`}
+        className={`flex flex-col items-center justify-center bg-white sm:min-w-24 md:min-w-28 lg:min-w-36 xl:min-w-48 p-2 rounded-xl h-auto transition-transform duration-300 ease-in-out hover:scale-105`}
       >
         <Card cardName={cardName} imageSrc={imageSrc} />
       </div>

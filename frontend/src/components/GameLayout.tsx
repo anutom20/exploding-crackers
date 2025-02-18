@@ -52,7 +52,7 @@ const GameLayout = ({
 
   return (
     <>
-      <div className="flex flex-col m-4 items-center h-fit pb-16 bg-white space-y-6 relative">
+      <div className="flex flex-col p-4 items-center h-fit pb-16 bg-white space-y-6 relative">
         <h3 className="text-lg font-medium">{currentPlayerTurn}'s turn</h3>
 
         <div className="flex flex-row space-x-4 mb-4">
@@ -84,7 +84,7 @@ const GameLayout = ({
             </div>
           ))}
         </div>
-        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+        <div className="flex flex-col sm:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
           {countdownGoing && (
             <h4 className="text-red-600 font-bold flex items-center gap-2">
               <PiClockCountdownBold className="text-2xl" /> Lose Countdown:{" "}
@@ -92,18 +92,18 @@ const GameLayout = ({
             </h4>
           )}
           <div
-            className="flex flex-col items-center justify-center space-y-2 bg-gray-800 text-white p-3 rounded-xl w-full sm:w-28 md:w-36 lg:w-48 xl:w-56 h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-300"
+            className="flex flex-col items-center justify-center space-y-2 bg-gray-800 text-white p-3 rounded-xl w-40 md:w-48 lg:w-56 h-44 sm:h-48 md:h-56 lg:h-64 cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-300"
             onClick={() => onCardClick("draw")}
           >
             <h2 className="text-xl">Draw from deck</h2>
             <FiPlus className="w-6 h-6 text-orange-500" size={32} />
           </div>
           <div
-            className={`flex flex-col items-center justify-center space-y-2 bg-gray-800 text-white p-3 rounded-xl w-full sm:w-28 md:w-36 lg:w-48 xl:w-56 ${
+            className={`flex flex-col items-center justify-center space-y-2 bg-gray-800 text-white p-3 rounded-xl w-40 md:w-48 lg:w-56 ${
               lastPlayedCard !== "None" &&
               lastPlayedCard !== "Card drawn from deck"
                 ? "h-auto"
-                : "h-40 sm:h-48 md:h-56 lg:h-64 xl:h-72"
+                : "h-40 sm:h-48 md:h-56 lg:h-56"
             }   hover:shadow-md hover:scale-105 transition-all duration-300 ${
               lastPlayedCard !== "None" &&
               lastPlayedCard !== "Card drawn from deck"
@@ -113,7 +113,7 @@ const GameLayout = ({
           >
             {lastPlayedCard !== "None" &&
             lastPlayedCard !== "Card drawn from deck" ? (
-              <div className="flex flex-col items-center justify-center space-y-2 bg-white text-white p-2 rounded-xl w-full sm:w-28 md:w-36 lg:w-48 xl:w-56 h-auto">
+              <div className="flex flex-col items-center justify-center space-y-2 bg-white text-white p-2 rounded-xl w-40 md:w-48 lg:w-56 h-auto">
                 <Card
                   cardName={lastPlayedCard}
                   imageSrc={
@@ -151,7 +151,7 @@ const GameLayout = ({
               {playerHands?.map((hand, index) => (
                 <div
                   key={index}
-                  className="bg-white text-white p-2 rounded-xl w-full sm:w-28 md:w-36 lg:w-48 xl:w-56 h-auto cursor-pointer flex-shrink-0 hover:shadow-md hover:scale-105 transition-all duration-300 overflow-hidden"
+                  className="bg-white text-white p-3 rounded-xl w-40 md:w-48 lg:w-56 h-auto cursor-pointer flex-shrink-0 hover:shadow-md hover:scale-105 transition-all duration-300 overflow-hidden"
                   onClick={() => onCardClick(hand)}
                 >
                   <Card
