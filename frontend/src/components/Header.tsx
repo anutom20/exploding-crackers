@@ -9,7 +9,7 @@ const Header = ({
 }) => {
   const navigate = useNavigate();
   return (
-    <div className="flex flex-row justify-between items-center bg-white shadow-sm p-4 border-b-2 w-full">
+    <div className="flex flex-row justify-between items-center bg-white shadow-sm p-2 sm:p-4 border-b-2 w-full">
       <div className="flex flex-row items-center gap-4">
         <h1
           className="text-2xl font-bold cursor-pointer"
@@ -25,7 +25,9 @@ const Header = ({
       >
         Your Turn!
       </div>
-      <p className="text-lg text-gray-500">Welcome, {currentUser}!</p>
+      <p className="text-md sm:text-lg text-gray-500 flex text-right">
+        Welcome, {currentUser}!
+      </p>
     </div>
   );
 };
