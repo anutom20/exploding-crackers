@@ -117,7 +117,7 @@ export const updateGameState = (
       gameState.lastPlayedCard = "shuffle";
       gameState.deck = shuffle(gameState.deck);
       removeCardFromHand(gameState, gameState.currentPlayerTurn, "shuffle");
-      break;
+      return gameState;
     case "future":
       gameState.lastPlayedCard = "future";
       gameState.showFutureCurrentPlayer = true;
