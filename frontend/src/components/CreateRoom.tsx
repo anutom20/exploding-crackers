@@ -92,7 +92,7 @@ const cardDescriptions = [
     cardName: "favor",
     imageSrc: favor,
     description:
-      "Enables you to request a favor (essentially steal a card) from any player still in the game. Your target has little recourse",
+      "Enables you to request a favor (essentially steal a card) from any player still in the game. Your target has little recourse. This does not count as a turn.",
   },
   {
     cardName: "future",

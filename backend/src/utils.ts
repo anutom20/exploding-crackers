@@ -129,7 +129,7 @@ export const updateGameState = (
         gameState.lastPlayedCard = "favor";
         removeCardFromHand(gameState, gameState.currentPlayerTurn, "favor");
       }
-      break;
+      return gameState;
     case "draw":
       const cardToDraw = gameState.deck.pop();
       if (cardToDraw === "explosion") {
