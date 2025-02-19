@@ -9,6 +9,7 @@ const Winner = ({
   players,
   hostUsername,
   username,
+  setEliminateCountdown,
 }: {
   winner: string;
   setOpen: (open: boolean) => void;
@@ -16,6 +17,7 @@ const Winner = ({
   players: { username: string; socketId: string }[];
   hostUsername: string;
   username: string;
+  setEliminateCountdown: (countdown: number) => void;
 }) => {
   useEffect(() => {
     socket.on("gameStarted", () => {
@@ -38,6 +40,7 @@ const Winner = ({
             <button
               className="bg-orange-500 text-white p-2 rounded-xl w-full sm:w-28 md:w-36 lg:w-48 xl:w-56 h-auto"
               onClick={() => {
+                setEliminateCountdown(import.meta.env.VITE_ELIMINATE_COUNTDOWN);
                 socket.emit("startGame", {
                   roomId,
                   playerUsernames: players.map((player) => player.username),

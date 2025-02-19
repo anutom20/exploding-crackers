@@ -2,6 +2,7 @@ import { TiTick } from "react-icons/ti";
 import { FaSkullCrossbones } from "react-icons/fa6";
 import { GrPrevious } from "react-icons/gr";
 import { GrNext } from "react-icons/gr";
+import { useEffect } from "react";
 import Attack from "/cards/attack.png";
 import Defuse from "/cards/defuse.png";
 import Explosion from "/cards/explosion.png";
@@ -13,9 +14,12 @@ import SeeTheFuture from "/cards/future.png";
 import { FiPlus } from "react-icons/fi";
 import Card from "./Card";
 import { PiClockCountdownBold } from "react-icons/pi";
+import { socket } from "../socket";
 
 const GameLayout = ({
+  gameCompleted,
   playerHands,
+  setEliminateCountdown,
   onCardClick,
   currentPlayerTurn,
   playersInGame,
@@ -24,8 +28,12 @@ const GameLayout = ({
   loseCountdown,
   players,
   noOfCardsEachPlayer,
+  username,
+  setEliminateTimeoutId,
 }: {
+  gameCompleted: boolean;
   playerHands: string[];
+  setEliminateCountdown: React.Dispatch<React.SetStateAction<number>>;
   onCardClick: (card: string) => void;
   currentPlayerTurn: string;
   lastPlayedCard: string;
@@ -34,6 +42,8 @@ const GameLayout = ({
   countdownGoing: boolean;
   loseCountdown: number;
   noOfCardsEachPlayer: { username: string; noOfCards: number }[];
+  username: string;
+  setEliminateTimeoutId: (id: number | null) => void;
 }) => {
   console.log("players", players);
 
@@ -50,12 +60,28 @@ const GameLayout = ({
     future: SeeTheFuture,
   };
 
+  useEffect(() => {
+    let timer: number;
+    if (currentPlayerTurn === username && !gameCompleted) {
+      timer = setInterval(() => {
+        setEliminateCountdown((prev: number) => {
+          console.log("prev", prev);
+          if (prev - 1 === 0) {
+            socket.emit("eliminate_player", { username, playersInGame });
+            clearInterval(timer);
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      setEliminateTimeoutId(timer);
+    }
+    return () => clearInterval(timer);
+  }, [currentPlayerTurn, gameCompleted]);
+
   return (
     <>
       <div className="flex flex-col p-4 items-center h-fit pb-16 bg-white space-y-6 relative">
-        <h3 className="text-lg font-medium">{currentPlayerTurn}'s turn</h3>
-
-        <div className="flex flex-row space-x-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           {players?.map((player) => (
             <div
               key={player.socketId}

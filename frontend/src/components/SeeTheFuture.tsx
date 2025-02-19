@@ -1,5 +1,5 @@
 import Card from "./Card";
-
+import React from "react";
 import Attack from "/cards/attack.png";
 import Defuse from "/cards/defuse.png";
 import Explosion from "/cards/explosion.png";
@@ -27,9 +27,29 @@ const SeeTheFuture = ({
     favor: Favor,
     future: Future,
   };
+  const [countdown, setCountdown] = React.useState(5);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setOpen(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <div className="absolute top-0 bg-black bg-opacity-50 w-full h-[130vh] flex items-center justify-center">
-      <div className="p-4 w-auto h-auto border-2 rounded-xl flex flex-col items-center justify-center space-y-2 bg-white transition-all duration-300">
+    <div className="fixed inset-0 bg-black bg-opacity-50 w-full h-full flex items-center justify-center">
+      <div className="p-4 w-auto h-auto border-2 rounded-xl flex flex-col items-center justify-center space-y-2 bg-white transition-all duration-300 relative">
+        <div className="absolute top-0 right-0 p-4">
+          <h1 className="text-gray-500 text-4xl font-bold">{countdown}</h1>
+        </div>
         <h2 className="text-xl">See the Future</h2>
         <h3 className="text-md text-gray-500 flex items-center gap-2 justify-center">
           Top 3 cards in the deck are shown from left to right{" "}

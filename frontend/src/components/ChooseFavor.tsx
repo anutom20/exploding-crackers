@@ -6,6 +6,8 @@ const ChooseFavor = ({
   setOpen,
   username,
   makeMove,
+  setEliminateTimeoutId,
+  eliminateTimeoutId,
 }: {
   players: { username: string; socketId: string; avatar: string }[];
   playersInGame: string[];
@@ -16,6 +18,8 @@ const ChooseFavor = ({
     placeExplosionCardInMiddle?: boolean,
     favorFromUsername?: string
   ) => void;
+  setEliminateTimeoutId: (id: number | null) => void;
+  eliminateTimeoutId: number | null;
 }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -35,6 +39,10 @@ const ChooseFavor = ({
                 key={player.username}
                 onClick={() => {
                   makeMove("favor", false, player.username);
+                  if (eliminateTimeoutId) {
+                    clearInterval(eliminateTimeoutId);
+                    setEliminateTimeoutId(null);
+                  }
                   setOpen(false);
                 }}
                 className="flex items-center mb-2 p-2 cursor-pointer hover:bg-gray-200"

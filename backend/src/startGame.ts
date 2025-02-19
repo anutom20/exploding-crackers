@@ -6,6 +6,8 @@ export const startGame = (
   gameInput: {
     roomId: string;
     playerUsernames: string[];
+    minPlayers: number;
+    maxPlayers: number;
   },
   app: Express,
   socket: Socket,
@@ -13,8 +15,18 @@ export const startGame = (
 ) => {
   const room = app.locals.usersInRoom[gameInput.roomId];
 
-  if (!room || room.length < 2) {
-    socket.emit("error", "Invalid room or not enough players");
+  if (!room) {
+    socket.emit("error", "Invalid room");
+    return;
+  }
+
+  if (room.length < gameInput.minPlayers) {
+    socket.emit("error", `not enough players, min is ${gameInput.minPlayers}`);
+    return;
+  }
+
+  if (room.length > gameInput.maxPlayers) {
+    socket.emit("error", `too many players, max is ${gameInput.maxPlayers}`);
     return;
   }
 

@@ -1,5 +1,4 @@
 import express from "express";
-import { startGame } from "../startGame";
 import { createRoom } from "../controllers/createRoom";
 const router = express.Router();
 

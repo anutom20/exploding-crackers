@@ -2,6 +2,8 @@ const ExplosionCardPlacement = ({
   setOpen,
   setExplosionCardPlacement,
   makeMove,
+  eliminateTimeoutId,
+  setEliminateTimeoutId,
 }: {
   setOpen: (open: boolean) => void;
   setExplosionCardPlacement: (placement: "top" | "random") => void;
@@ -9,6 +11,8 @@ const ExplosionCardPlacement = ({
     move: "future" | "skip" | "reverse" | "defuse" | "explosion",
     placeExplosionCardInMiddle?: boolean
   ) => void;
+  setEliminateTimeoutId: (id: number | null) => void;
+  eliminateTimeoutId: number | null;
 }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -22,6 +26,10 @@ const ExplosionCardPlacement = ({
             onClick={() => {
               setExplosionCardPlacement("top");
               makeMove("defuse");
+              if (eliminateTimeoutId) {
+                clearInterval(eliminateTimeoutId);
+                setEliminateTimeoutId(null);
+              }
               setOpen(false);
             }}
           >
@@ -32,6 +40,10 @@ const ExplosionCardPlacement = ({
             onClick={() => {
               setExplosionCardPlacement("random");
               makeMove("defuse", true);
+              if (eliminateTimeoutId) {
+                clearInterval(eliminateTimeoutId);
+                setEliminateTimeoutId(null);
+              }
               setOpen(false);
             }}
           >

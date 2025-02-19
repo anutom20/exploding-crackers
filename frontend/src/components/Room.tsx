@@ -63,6 +63,13 @@ function Room() {
 
   const [showWinner, setShowWinner] = useState(false);
 
+  const [eliminateTimeoutId, setEliminateTimeoutId] = useState<number | null>(
+    null
+  );
+  const [eliminateCountdown, setEliminateCountdown] = useState<number>(
+    import.meta.env.VITE_ELIMINATE_COUNTDOWN
+  );
+
   useEffect(() => {
     if (gameState?.playersInGame?.length === 1 && !gameState?.gameCompleted) {
       socket.emit("gameCompleted", roomId);
@@ -71,7 +78,14 @@ function Room() {
 
   useEffect(() => {
     socket.on("error", (error) => {
-      alert(error);
+      enqueueSnackbar(error, {
+        variant: "error",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "center",
+        },
+        autoHideDuration: 2500,
+      });
     });
 
     socket.on("gameStateUpdate", (gameState) => {
@@ -155,13 +169,21 @@ function Room() {
   }, []);
 
   const joinRoom = (avatar: string) => {
-    socket.emit("joinRoom", { roomId, username, avatar });
+    socket.emit("joinRoom", {
+      roomId,
+      username,
+      avatar,
+      maxPlayers: import.meta.env.VITE_MAX_PLAYERS,
+    });
   };
 
   const startGame = async () => {
+    setEliminateCountdown(import.meta.env.VITE_ELIMINATE_COUNTDOWN);
     socket.emit("startGame", {
       roomId,
       playerUsernames: players.map((player) => player.username),
+      minPlayers: import.meta.env.VITE_MIN_PLAYERS,
+      maxPlayers: import.meta.env.VITE_MAX_PLAYERS,
     });
   };
 
@@ -225,6 +247,9 @@ function Room() {
           <Header
             currentUser={username}
             currentPlayerTurn={gameState?.currentPlayerTurn}
+            playersInGame={gameState?.playersInGame ?? []}
+            elimiateCountdown={eliminateCountdown}
+            gameCompleted={gameState?.gameCompleted}
           />
         </div>
 
@@ -234,13 +259,16 @@ function Room() {
               <h3 className="text-xl font-bold text-gray-800 mb-6">
                 Players in the Room
               </h3>
-              <ul className="list-none space-y-2">
+              <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {players.map((player) => (
-                  <li key={player.socketId} className="bg-white p-4">
+                  <li
+                    key={player.socketId}
+                    className="bg-white p-4 flex items-center"
+                  >
                     <img
                       src={player.avatar}
                       alt="User"
-                      className="w-10 h-10 rounded-full border-2 border-gray-300"
+                      className="w-10 h-10 rounded-full border-2 border-gray-300 mr-2"
                     />
                     <span className="text-gray-700 text-md">
                       {player.username}
@@ -295,13 +323,17 @@ function Room() {
         )}
         {gameState && (
           <GameLayout
+            gameCompleted={gameState?.gameCompleted}
+            setEliminateCountdown={setEliminateCountdown}
             countdownGoing={countdownGoing}
             loseCountdown={loseCountdown}
             players={players}
+            setEliminateTimeoutId={setEliminateTimeoutId}
             playersInGame={gameState?.playersInGame}
             noOfCardsEachPlayer={noOfCardsEachPlayer}
             lastPlayedCard={gameState?.lastPlayedCard}
             playerHands={gameState?.playerHands[username]}
+            username={username}
             onCardClick={(move: string) => {
               if (move === "future") {
                 setSeeTheFutureOpen(true);
@@ -317,6 +349,10 @@ function Room() {
               }
               setCurrentPlayerMove(move);
               makeMove(move as MoveType);
+              if (eliminateTimeoutId) {
+                clearInterval(eliminateTimeoutId);
+                setEliminateTimeoutId(null);
+              }
             }}
             currentPlayerTurn={gameState?.currentPlayerTurn}
           />
@@ -355,6 +391,8 @@ function Room() {
           makeMove={makeMove}
           setOpen={setExplosionCardPlacementOpen}
           setExplosionCardPlacement={setExplosionCardPlacement}
+          setEliminateTimeoutId={setEliminateTimeoutId}
+          eliminateTimeoutId={eliminateTimeoutId}
         />
       )}
       {chooseFavorOpen && gameState?.currentPlayerTurn === username && (
@@ -364,10 +402,13 @@ function Room() {
           playersInGame={gameState?.playersInGame}
           setOpen={setChooseFavorOpen}
           makeMove={makeMove}
+          setEliminateTimeoutId={setEliminateTimeoutId}
+          eliminateTimeoutId={eliminateTimeoutId}
         />
       )}
       {showWinner && (
         <Winner
+          setEliminateCountdown={setEliminateCountdown}
           hostUsername={hostUsername}
           username={username}
           winner={gameState?.playersInGame[0]}

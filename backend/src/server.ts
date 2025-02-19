@@ -43,6 +43,17 @@ io.on("connection", (socket) => {
       socket.emit("error", "You cannot join this room , game already started");
       return;
     }
+
+    if (
+      app.locals.usersInRoom[roomData.roomId]?.length >= roomData?.maxPlayers
+    ) {
+      socket.emit(
+        "error",
+        "Room is full , max players are " + roomData?.maxPlayers
+      );
+      return;
+    }
+
     if (
       app.locals.usersInRoom[roomData.roomId] &&
       app.locals.usersInRoom[roomData.roomId].find(
@@ -99,6 +110,27 @@ io.on("connection", (socket) => {
 
   socket.on("stopCountdownRequest", (roomId) => {
     io.to(roomId).emit("stopCountdown");
+  });
+
+  socket.on("eliminate_player", (gameData) => {
+    const roomId = app.locals.socketRoomMap[socket.id];
+    const gameState = app.locals.gameState[roomId];
+    if (!gameState) {
+      socket.emit("error", "Game state not found");
+      return;
+    }
+    const playerIndex = gameState.playersInGame.findIndex(
+      (player: string) => player === gameData.username
+    );
+    if (playerIndex !== -1) {
+      gameState.playersInGame.splice(playerIndex, 1);
+    }
+    gameState.currentPlayerTurn = getNextPlayer(
+      gameState.currentPlayerTurn,
+      gameState.playersInGame,
+      gameState.gameDirection
+    );
+    io.to(roomId).emit("gameStateUpdate", gameState);
   });
 
   socket.on("updateGameState", (moveData) => {

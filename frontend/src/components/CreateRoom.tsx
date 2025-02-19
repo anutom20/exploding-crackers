@@ -92,7 +92,7 @@ const cardDescriptions = [
     cardName: "favor",
     imageSrc: favor,
     description:
-      "Enables you to request a favor (essentially steal a card) from any player still in the game. Your target has little recourse. This action does not count as a turn.",
+      "Enables you to request a favor (essentially steal a card) from any player still in the game. Your target has little recourse",
   },
   {
     cardName: "future",
@@ -132,6 +132,8 @@ function CreateRoom() {
       roomId: data.roomId,
       username: username,
       avatar: avatar,
+      maxPlayers: import.meta.env.VITE_MAX_PLAYERS,
+      currentPlayers: 0,
       host: true,
     });
 
