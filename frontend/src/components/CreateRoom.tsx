@@ -205,9 +205,13 @@ function CreateRoom() {
           </span>
         </h2>
         <p className="text-xl text-white mb-4">
-          The first rule of Exploding Chickens is simple. Don't explode.
+          The first rule of Exploding Chickens is simple. Don't explode. Each
+          player takes turns drawing and playing cards. If any player dosen't
+          have a defuse card when they draw an explosion card, they explode. The
+          game ends when there is only one player left. If the player dosen't
+          play a move for 30 seconds , they're eliminated
         </p>
-        <h3 className="text-3xl font-semibold text-white mb-2">
+        <h3 className="text-3xl font-semibold  mb-2 mt-4 bg-gradient-to-r from-yellow-500 to-red-500 text-transparent bg-clip-text">
           Game Structure
         </h3>
         <p className="text-xl text-white">

@@ -77,7 +77,7 @@ const GameLayout = ({
       setEliminateTimeoutId(timer);
     }
     return () => clearInterval(timer);
-  }, [currentPlayerTurn, gameCompleted]);
+  }, [currentPlayerTurn, gameCompleted, lastPlayedCard]);
 
   return (
     <>

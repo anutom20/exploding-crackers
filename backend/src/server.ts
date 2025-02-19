@@ -130,6 +130,12 @@ io.on("connection", (socket) => {
       gameState.playersInGame,
       gameState.gameDirection
     );
+
+    const explosionCardIndex = gameState?.deck?.indexOf("explosion");
+    if (explosionCardIndex !== -1) {
+      gameState?.deck?.splice(explosionCardIndex, 1);
+    }
+
     io.to(roomId).emit("gameStateUpdate", gameState);
   });
 
