@@ -249,7 +249,7 @@ function Room() {
             currentPlayerTurn={gameState?.currentPlayerTurn}
             playersInGame={gameState?.playersInGame ?? []}
             elimiateCountdown={eliminateCountdown}
-            gameCompleted={gameState?.gameCompleted}
+            gameInProgress={gameState ? true : false}
           />
         </div>
 

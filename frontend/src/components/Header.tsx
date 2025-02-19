@@ -1,32 +1,35 @@
 import { useNavigate } from "react-router-dom";
-
+import { socket } from "../socket";
 const Header = ({
   currentUser,
   currentPlayerTurn,
   playersInGame,
   elimiateCountdown,
-  gameCompleted,
+  gameInProgress,
 }: {
   currentUser: string;
   currentPlayerTurn: string;
   playersInGame: string[];
   elimiateCountdown: number | null;
-  gameCompleted: boolean;
+  gameInProgress: boolean;
 }) => {
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 justify-between items-center bg-white shadow-sm p-2 sm:p-4 border-b-2 w-full">
+    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:justify-between items-center bg-white shadow-sm p-2 sm:p-4 border-b-2 w-full">
       <div className="flex flex-row items-center gap-4">
         <h1
           className="text-2xl font-bold cursor-pointer"
-          onClick={() => navigate("/")}
+          onClick={() => {
+            socket.disconnect();
+            navigate("/");
+          }}
         >
           Exploding <span className="text-orange-500">Chickens</span>
         </h1>
       </div>
-      {elimiateCountdown && !gameCompleted && (
+      {elimiateCountdown && gameInProgress && (
         <p className="text-md text-gray-500">
-          Play under {Math.floor(elimiateCountdown)}s
+          {Math.floor(elimiateCountdown)}s
         </p>
       )}
       <div

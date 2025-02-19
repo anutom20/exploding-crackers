@@ -62,6 +62,7 @@ const GameLayout = ({
 
   useEffect(() => {
     let timer: number;
+    setEliminateCountdown(import.meta.env.VITE_ELIMINATE_COUNTDOWN);
     if (currentPlayerTurn === username && !gameCompleted) {
       timer = setInterval(() => {
         setEliminateCountdown((prev: number) => {

@@ -211,7 +211,7 @@ function CreateRoom() {
           Game Structure
         </h3>
         <p className="text-xl text-white">
-          2-6 players per room. 7 min average play time.
+          2-5 players per room. 7 min average play time.
         </p>
       </div>
       <div className="flex flex-col gap-12 mt-12">
