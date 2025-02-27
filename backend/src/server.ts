@@ -160,6 +160,10 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("gameStateUpdate", gameState);
   });
 
+  socket.on("playCardSound", ({ roomId, type }) => {
+    io.to(roomId).emit("playCardSound", { type });
+  });
+
   socket.on("disconnect", () => {
     console.log("A user disconnected");
     const roomId = app.locals.socketRoomMap[socket.id];

@@ -12,7 +12,11 @@ import ChooseFavor from "./ChooseFavor";
 import { MoveType } from "../types";
 import Winner from "./Winner";
 import ChooseAvatar from "./ChooseAvatar";
+import { initialState, soundReducer } from "../audioReducer";
+import { useReducer } from "react";
+
 function Room() {
+  const [state, dispatch] = useReducer(soundReducer, initialState);
   const { roomId } = useParams();
   const { username: usernameFromState } = useLocation().state || "";
   const { enqueueSnackbar } = useSnackbar();
@@ -77,6 +81,15 @@ function Room() {
   }, [gameState]);
 
   useEffect(() => {
+    if (gameState?.explosionCardAtCurrentPlayer) {
+      socket.emit("playCardSound", {
+        roomId,
+        type: "CHICKEN_CARD",
+      });
+    }
+  }, [gameState?.explosionCardAtCurrentPlayer]);
+
+  useEffect(() => {
     socket.on("error", (error) => {
       enqueueSnackbar(error, {
         variant: "error",
@@ -86,6 +99,10 @@ function Room() {
         },
         autoHideDuration: 2500,
       });
+    });
+
+    socket.on("playCardSound", ({ type }) => {
+      dispatch({ type });
     });
 
     socket.on("gameStateUpdate", (gameState) => {
@@ -335,6 +352,17 @@ function Room() {
             playerHands={gameState?.playerHands[username]}
             username={username}
             onCardClick={(move: string) => {
+              socket.emit("playCardSound", {
+                roomId,
+                type: "PLAY_CARD",
+              });
+
+              if (move === "explosion") {
+                socket.emit("playCardSound", {
+                  roomId,
+                  type: "EXPLOSION",
+                });
+              }
               if (move === "future") {
                 setSeeTheFutureOpen(true);
               } else if (
