@@ -45,6 +45,7 @@ export const startGame = (
     currentPlayerRepeatedTurns: 0,
     showFutureCurrentPlayer: false,
     explosionCardAtCurrentPlayer: false,
+    currentPlayerTurnAgain: false,
     lastPlayedCard: "None",
     gameDirection: "clockwise",
     currentPlayerTurn: app.locals.gameHosts[gameInput.roomId],
@@ -59,6 +60,7 @@ export const startGame = (
     explosionCardAtCurrentPlayer: false,
     gameDirection: "clockwise",
     lastPlayedCard: "None",
+    currentPlayerTurnAgain: false,
     currentPlayerTurn: app.locals.gameHosts[gameInput.roomId],
   });
 };

@@ -1,3 +1,4 @@
+import { useSnackbar } from "notistack";
 import { MoveType } from "../types";
 
 const ChooseFavor = ({
@@ -21,6 +22,7 @@ const ChooseFavor = ({
   setEliminateTimeoutId: (id: number | null) => void;
   eliminateTimeoutId: number | null;
 }) => {
+  const { enqueueSnackbar } = useSnackbar();
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -44,6 +46,13 @@ const ChooseFavor = ({
                     setEliminateTimeoutId(null);
                   }
                   setOpen(false);
+                  enqueueSnackbar(`${username} played favor`, {
+                    variant: "info",
+                    anchorOrigin: {
+                      vertical: "top",
+                      horizontal: "right",
+                    },
+                  });
                 }}
                 className="flex items-center mb-2 p-2 cursor-pointer hover:bg-gray-200"
               >

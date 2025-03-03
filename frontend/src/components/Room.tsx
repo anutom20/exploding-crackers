@@ -16,7 +16,7 @@ import { initialState, soundReducer } from "../audioReducer";
 import { useReducer } from "react";
 
 function Room() {
-  const [state, dispatch] = useReducer(soundReducer, initialState);
+  const [, dispatch] = useReducer(soundReducer, initialState);
   const { roomId } = useParams();
   const { username: usernameFromState } = useLocation().state || "";
   const { enqueueSnackbar } = useSnackbar();
@@ -82,6 +82,13 @@ function Room() {
 
   useEffect(() => {
     if (gameState?.explosionCardAtCurrentPlayer) {
+      enqueueSnackbar(`${username} drew a chicken card`, {
+        variant: "info",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
       socket.emit("playCardSound", {
         roomId,
         type: "CHICKEN_CARD",
@@ -173,6 +180,17 @@ function Room() {
         currentPlayerMove: "explosion",
         playerUsernames: gameState.playersInGame,
       });
+      socket.emit("playCardSound", {
+        roomId,
+        type: "EXPLOSION",
+      });
+      enqueueSnackbar(`${username} exploded`, {
+        variant: "error",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+      });
     }
   }, [countdownGoing, loseCountdown]);
 
@@ -239,6 +257,7 @@ function Room() {
           playerUsernames: gameState.playersInGame,
         });
       }
+      return 1;
     } else {
       enqueueSnackbar("Not your turn", {
         variant: "warning",
@@ -248,6 +267,7 @@ function Room() {
         },
         autoHideDuration: 2000,
       });
+      return 0;
     }
   };
 
@@ -264,6 +284,7 @@ function Room() {
           <Header
             currentUser={username}
             currentPlayerTurn={gameState?.currentPlayerTurn}
+            currentPlayerTurnAgain={gameState?.currentPlayerTurnAgain}
             playersInGame={gameState?.playersInGame ?? []}
             elimiateCountdown={eliminateCountdown}
             gameInProgress={gameState ? true : false}
@@ -352,17 +373,6 @@ function Room() {
             playerHands={gameState?.playerHands[username]}
             username={username}
             onCardClick={(move: string) => {
-              socket.emit("playCardSound", {
-                roomId,
-                type: "PLAY_CARD",
-              });
-
-              if (move === "explosion") {
-                socket.emit("playCardSound", {
-                  roomId,
-                  type: "EXPLOSION",
-                });
-              }
               if (move === "future") {
                 setSeeTheFutureOpen(true);
               } else if (
@@ -376,10 +386,42 @@ function Room() {
                 return;
               }
               setCurrentPlayerMove(move);
-              makeMove(move as MoveType);
+              const result = makeMove(move as MoveType);
+              if (result === 0) {
+                return;
+              }
               if (eliminateTimeoutId) {
                 clearInterval(eliminateTimeoutId);
                 setEliminateTimeoutId(null);
+              }
+              if (move === "shuffle") {
+                socket.emit("playCardSound", {
+                  roomId,
+                  type: "SHUFFLE",
+                });
+              } else {
+                socket.emit("playCardSound", {
+                  roomId,
+                  type: "PLAY_CARD",
+                });
+              }
+
+              if (move !== "draw") {
+                enqueueSnackbar(`${username} played ${move}`, {
+                  variant: "info",
+                  anchorOrigin: {
+                    vertical: "top",
+                    horizontal: "right",
+                  },
+                });
+              } else {
+                enqueueSnackbar(`${username} drew a card`, {
+                  variant: "info",
+                  anchorOrigin: {
+                    vertical: "top",
+                    horizontal: "right",
+                  },
+                });
               }
             }}
             currentPlayerTurn={gameState?.currentPlayerTurn}
@@ -421,6 +463,8 @@ function Room() {
           setExplosionCardPlacement={setExplosionCardPlacement}
           setEliminateTimeoutId={setEliminateTimeoutId}
           eliminateTimeoutId={eliminateTimeoutId}
+          roomId={roomId ?? ""}
+          username={username}
         />
       )}
       {chooseFavorOpen && gameState?.currentPlayerTurn === username && (

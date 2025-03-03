@@ -1,9 +1,13 @@
+import { socket } from "../socket";
+import { useSnackbar } from "notistack";
 const ExplosionCardPlacement = ({
   setOpen,
   setExplosionCardPlacement,
   makeMove,
   eliminateTimeoutId,
   setEliminateTimeoutId,
+  roomId,
+  username,
 }: {
   setOpen: (open: boolean) => void;
   setExplosionCardPlacement: (placement: "top" | "random") => void;
@@ -13,7 +17,10 @@ const ExplosionCardPlacement = ({
   ) => void;
   setEliminateTimeoutId: (id: number | null) => void;
   eliminateTimeoutId: number | null;
+  roomId: string;
+  username: string;
 }) => {
+  const { enqueueSnackbar } = useSnackbar();
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -30,7 +37,18 @@ const ExplosionCardPlacement = ({
                 clearInterval(eliminateTimeoutId);
                 setEliminateTimeoutId(null);
               }
+              socket.emit("playCardSound", {
+                roomId,
+                type: "DEFUSE",
+              });
               setOpen(false);
+              enqueueSnackbar(`${username} played defuse`, {
+                variant: "info",
+                anchorOrigin: {
+                  vertical: "top",
+                  horizontal: "right",
+                },
+              });
             }}
           >
             Place On Top
@@ -44,7 +62,18 @@ const ExplosionCardPlacement = ({
                 clearInterval(eliminateTimeoutId);
                 setEliminateTimeoutId(null);
               }
+              socket.emit("playCardSound", {
+                roomId,
+                type: "DEFUSE",
+              });
               setOpen(false);
+              enqueueSnackbar(`${username} played defuse`, {
+                variant: "info",
+                anchorOrigin: {
+                  vertical: "top",
+                  horizontal: "right",
+                },
+              });
             }}
           >
             Place Randomly

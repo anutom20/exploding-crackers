@@ -2,9 +2,10 @@ export interface GameState {
   showFutureCurrentPlayer: boolean;
   lastPlayedCard: string;
   currentPlayerTurn: string;
-  currentPlayerRepeatedTurns: number;
+  currentPlayerRepeatedTurns: boolean;
   gameDirection: "clockwise" | "counterclockwise";
   explosionCardAtCurrentPlayer: boolean;
+  currentPlayerTurnAgain: boolean;
   deck: string[];
   gameCompleted?: boolean;
   playerHands: { [username: string]: string[] };
@@ -105,31 +106,35 @@ export const updateGameState = (
       break;
     case "attack":
       gameState.lastPlayedCard = "attack";
-      gameState.currentPlayerRepeatedTurns++;
+      gameState.currentPlayerRepeatedTurns = true;
       removeCardFromHand(gameState, gameState.currentPlayerTurn, "attack");
       gameState.currentPlayerTurn = getNextPlayer(
         gameState.currentPlayerTurn,
         playerUsernames,
         gameState.gameDirection
       );
+      gameState.currentPlayerTurnAgain = false;
       return gameState;
     case "shuffle":
       gameState.lastPlayedCard = "shuffle";
       gameState.deck = shuffle(gameState.deck);
+      gameState.currentPlayerRepeatedTurns = true;
       removeCardFromHand(gameState, gameState.currentPlayerTurn, "shuffle");
-      return gameState;
+      break;
     case "future":
       gameState.lastPlayedCard = "future";
       gameState.showFutureCurrentPlayer = true;
+      gameState.currentPlayerRepeatedTurns = true;
       removeCardFromHand(gameState, gameState.currentPlayerTurn, "future");
-      return gameState;
+      break;
     case "favor":
       if (favorFromUsername) {
         transferCard(gameState, favorFromUsername, playerUsernames);
         gameState.lastPlayedCard = "favor";
+        gameState.currentPlayerRepeatedTurns = true;
         removeCardFromHand(gameState, gameState.currentPlayerTurn, "favor");
       }
-      return gameState;
+      break;
     case "draw":
       const cardToDraw = gameState.deck.pop();
       if (cardToDraw === "explosion") {
@@ -169,8 +174,11 @@ export const updateGameState = (
       throw new Error("Invalid move");
   }
   if (gameState.currentPlayerRepeatedTurns) {
-    gameState.currentPlayerRepeatedTurns--;
+    gameState.currentPlayerRepeatedTurns = false;
+    gameState.currentPlayerTurnAgain = true;
     return gameState;
+  } else {
+    gameState.currentPlayerTurnAgain = false;
   }
   gameState.currentPlayerTurn = getNextPlayer(
     gameState.currentPlayerTurn,
