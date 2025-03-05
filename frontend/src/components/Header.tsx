@@ -81,11 +81,15 @@ const Header = ({
             ? "opacity-0"
             : currentPlayerTurn === currentUser
             ? "bg-green-500"
+            : !playersInGame?.includes(currentUser)
+            ? "bg-red-500"
             : "bg-orange-500"
         }`}
       >
         {playersInGame?.length === 0
           ? "opacity-0"
+          : !playersInGame?.includes(currentUser)
+          ? "You are eliminated!"
           : currentPlayerTurnAgain && currentPlayerTurn === currentUser
           ? "Your Turn Again!"
           : currentPlayerTurn === currentUser
