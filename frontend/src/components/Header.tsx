@@ -11,6 +11,8 @@ const Header = ({
   playersInGame,
   elimiateCountdown,
   gameInProgress,
+  players,
+  roomId,
 }: {
   currentUser: string;
   currentPlayerTurn: string;
@@ -18,6 +20,8 @@ const Header = ({
   playersInGame: string[];
   elimiateCountdown: number | null;
   gameInProgress: boolean;
+  players: { username: string; avatar: string }[];
+  roomId: string;
 }) => {
   const [, dispatch] = useReducer(soundReducer, initialState);
 
@@ -26,6 +30,15 @@ const Header = ({
   useEffect(() => {
     if (elimiateCountdown && elimiateCountdown === 5) {
       dispatch({ type: "ELIMINATE_CLOCK" });
+    }
+    if (elimiateCountdown && elimiateCountdown === 0) {
+      socket.emit("gameNotification", {
+        roomId,
+        player: currentUser,
+        avatar: players.find((player) => player.username === currentUser)
+          ?.avatar,
+        message: `${currentUser} has been eliminated!`,
+      });
     }
   }, [elimiateCountdown]);
 
