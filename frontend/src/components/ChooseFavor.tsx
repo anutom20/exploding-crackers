@@ -1,6 +1,7 @@
 import { useSnackbar } from "notistack";
 import { MoveType } from "../types";
-
+import { socket } from "../socket";
+import GameNotifications from "./GameNotifications";
 const ChooseFavor = ({
   players,
   playersInGame,
@@ -9,6 +10,7 @@ const ChooseFavor = ({
   makeMove,
   setEliminateTimeoutId,
   eliminateTimeoutId,
+  roomId,
 }: {
   players: { username: string; socketId: string; avatar: string }[];
   playersInGame: string[];
@@ -21,6 +23,7 @@ const ChooseFavor = ({
   ) => void;
   setEliminateTimeoutId: (id: number | null) => void;
   eliminateTimeoutId: number | null;
+  roomId: string;
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   return (
@@ -46,12 +49,27 @@ const ChooseFavor = ({
                     setEliminateTimeoutId(null);
                   }
                   setOpen(false);
-                  enqueueSnackbar(`${username} played favor`, {
-                    variant: "info",
-                    anchorOrigin: {
-                      vertical: "top",
-                      horizontal: "right",
-                    },
+                  enqueueSnackbar(
+                    `${username} played favor , ${player.username} lost a card!!`,
+                    {
+                      variant: "info",
+                      anchorOrigin: {
+                        vertical: "bottom",
+                        horizontal: "right",
+                      },
+                      content: (
+                        <GameNotifications
+                          message={`${username} played favor , ${player.username} lost a card!!`}
+                          avatar={player.avatar}
+                          username={username}
+                        />
+                      ),
+                    }
+                  );
+
+                  socket.emit("playCardSound", {
+                    roomId,
+                    type: "PLAY_CARD",
                   });
                 }}
                 className="flex items-center mb-2 p-2 cursor-pointer hover:bg-gray-200"

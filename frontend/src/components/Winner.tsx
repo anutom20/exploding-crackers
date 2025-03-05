@@ -23,6 +23,10 @@ const Winner = ({
     socket.on("gameStarted", () => {
       setOpen(false);
     });
+    socket.emit("playCardSound", {
+      roomId,
+      type: "CONGRATS",
+    });
     setTimeout(() => {
       setShowConfetti(true);
     }, 5000);

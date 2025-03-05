@@ -24,6 +24,12 @@ const Header = ({
   console.log("currentPlayerTurnAgain", currentPlayerTurnAgain);
 
   useEffect(() => {
+    if (elimiateCountdown && elimiateCountdown === 5) {
+      dispatch({ type: "ELIMINATE_CLOCK" });
+    }
+  }, [elimiateCountdown]);
+
+  useEffect(() => {
     if (currentPlayerTurn === currentUser || currentPlayerTurnAgain) {
       dispatch({ type: "TURN_SOUND" });
     }
@@ -58,7 +64,11 @@ const Header = ({
         </h1>
       </div>
       {elimiateCountdown && gameInProgress && (
-        <p className="text-md text-gray-500">
+        <p
+          className={`text-md text-gray-500 ${
+            elimiateCountdown <= 5 ? "text-red-500" : ""
+          }`}
+        >
           {Math.floor(elimiateCountdown)}s
         </p>
       )}

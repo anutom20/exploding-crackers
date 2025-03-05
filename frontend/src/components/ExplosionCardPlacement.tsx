@@ -1,5 +1,6 @@
 import { socket } from "../socket";
 import { useSnackbar } from "notistack";
+import GameNotifications from "./GameNotifications";
 const ExplosionCardPlacement = ({
   setOpen,
   setExplosionCardPlacement,
@@ -8,6 +9,7 @@ const ExplosionCardPlacement = ({
   setEliminateTimeoutId,
   roomId,
   username,
+  players,
 }: {
   setOpen: (open: boolean) => void;
   setExplosionCardPlacement: (placement: "top" | "random") => void;
@@ -19,6 +21,7 @@ const ExplosionCardPlacement = ({
   eliminateTimeoutId: number | null;
   roomId: string;
   username: string;
+  players: { username: string; avatar: string }[];
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   return (
@@ -45,9 +48,19 @@ const ExplosionCardPlacement = ({
               enqueueSnackbar(`${username} played defuse`, {
                 variant: "info",
                 anchorOrigin: {
-                  vertical: "top",
+                  vertical: "bottom",
                   horizontal: "right",
                 },
+                content: (
+                  <GameNotifications
+                    message={`${username} played defuse`}
+                    avatar={
+                      players.find((player) => player.username === username)
+                        ?.avatar
+                    }
+                    username={username}
+                  />
+                ),
               });
             }}
           >
@@ -70,9 +83,19 @@ const ExplosionCardPlacement = ({
               enqueueSnackbar(`${username} played defuse`, {
                 variant: "info",
                 anchorOrigin: {
-                  vertical: "top",
+                  vertical: "bottom",
                   horizontal: "right",
                 },
+                content: (
+                  <GameNotifications
+                    message={`${username} played defuse`}
+                    avatar={
+                      players.find((player) => player.username === username)
+                        ?.avatar
+                    }
+                    username={username}
+                  />
+                ),
               });
             }}
           >

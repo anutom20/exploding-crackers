@@ -113,9 +113,8 @@ const GameLayout = ({
         </div>
         <div className="flex flex-col sm:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
           {countdownGoing && (
-            <h4 className="text-red-600 font-bold flex items-center gap-2">
-              <PiClockCountdownBold className="text-2xl" /> Lose Countdown:{" "}
-              {loseCountdown}
+            <h4 className="text-red-600 text-md sm:text-lg md:text-2xl font-bold flex items-center gap-2">
+              <PiClockCountdownBold size={64} /> Lose Countdown: {loseCountdown}
             </h4>
           )}
           <div

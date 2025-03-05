@@ -14,6 +14,7 @@ import Winner from "./Winner";
 import ChooseAvatar from "./ChooseAvatar";
 import { initialState, soundReducer } from "../audioReducer";
 import { useReducer } from "react";
+import GameNotifications from "./GameNotifications";
 
 function Room() {
   const [, dispatch] = useReducer(soundReducer, initialState);
@@ -85,9 +86,18 @@ function Room() {
       enqueueSnackbar(`${username} drew a chicken card`, {
         variant: "info",
         anchorOrigin: {
-          vertical: "top",
+          vertical: "bottom",
           horizontal: "right",
         },
+        content: (
+          <GameNotifications
+            message={`${username} drew a chicken card`}
+            avatar={
+              players.find((player) => player.username === username)?.avatar
+            }
+            username={username}
+          />
+        ),
       });
       socket.emit("playCardSound", {
         roomId,
@@ -187,9 +197,18 @@ function Room() {
       enqueueSnackbar(`${username} exploded`, {
         variant: "error",
         anchorOrigin: {
-          vertical: "top",
+          vertical: "bottom",
           horizontal: "right",
         },
+        content: (
+          <GameNotifications
+            message={`${username} exploded`}
+            avatar={
+              players.find((player) => player.username === username)?.avatar
+            }
+            username={username}
+          />
+        ),
       });
     }
   }, [countdownGoing, loseCountdown]);
@@ -410,17 +429,37 @@ function Room() {
                 enqueueSnackbar(`${username} played ${move}`, {
                   variant: "info",
                   anchorOrigin: {
-                    vertical: "top",
+                    vertical: "bottom",
                     horizontal: "right",
                   },
+                  content: (
+                    <GameNotifications
+                      message={`${username} played ${move}`}
+                      avatar={
+                        players.find((player) => player.username === username)
+                          ?.avatar
+                      }
+                      username={username}
+                    />
+                  ),
                 });
               } else {
                 enqueueSnackbar(`${username} drew a card`, {
                   variant: "info",
                   anchorOrigin: {
-                    vertical: "top",
+                    vertical: "bottom",
                     horizontal: "right",
                   },
+                  content: (
+                    <GameNotifications
+                      message={`${username} drew a card`}
+                      avatar={
+                        players.find((player) => player.username === username)
+                          ?.avatar
+                      }
+                      username={username}
+                    />
+                  ),
                 });
               }
             }}
@@ -464,12 +503,14 @@ function Room() {
           setEliminateTimeoutId={setEliminateTimeoutId}
           eliminateTimeoutId={eliminateTimeoutId}
           roomId={roomId ?? ""}
+          players={players}
           username={username}
         />
       )}
       {chooseFavorOpen && gameState?.currentPlayerTurn === username && (
         <ChooseFavor
           players={players}
+          roomId={roomId ?? ""}
           username={username}
           playersInGame={gameState?.playersInGame}
           setOpen={setChooseFavorOpen}

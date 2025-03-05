@@ -5,6 +5,8 @@ const initialState = {
   defuse: new Audio("/sounds/defuse.mp3"),
   shuffle: new Audio("/sounds/shuffle.mp3"),
   turn: new Audio("/sounds/turn.mp3"),
+  congrats: new Audio("/sounds/congrats.mp3"),
+  eliminateClock: new Audio("/sounds/countdown.mp3"),
 };
 
 const soundReducer = (state = initialState, action: { type: string }) => {
@@ -33,6 +35,14 @@ const soundReducer = (state = initialState, action: { type: string }) => {
 
     case "TURN_SOUND":
       state.turn.play();
+      return { ...state };
+
+    case "CONGRATS":
+      state.congrats.play();
+      return { ...state };
+
+    case "ELIMINATE_CLOCK":
+      state.eliminateClock.play();
       return { ...state };
     default:
       return state;
