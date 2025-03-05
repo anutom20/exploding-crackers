@@ -110,7 +110,7 @@ const cardDescriptions = [
     cardName: "Hot Potato",
     imageSrc: hotPotato,
     description:
-      "If you happen to draw an Exploding Chicken, your turn concludes as you pass the EC to the next player in line. They will now need to defuse it!",
+      "If you happen to draw an Exploding Chicken, your turn concludes as you pass the EC to the next player in line. They will now need to defuse it!.This card is only found in the deck in the beginning of the game.",
   },
 ];
 

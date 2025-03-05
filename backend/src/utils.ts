@@ -43,10 +43,6 @@ export function createDeck(numPlayers: number) {
     deck.push(normalCardTypes[i]);
   }
 
-  for (let i = 0; i < numPlayers; i++) {
-    deck.push("hot_potato");
-  }
-
   shuffle(deck);
   return deck;
 }
@@ -85,6 +81,10 @@ export function distributeCards(
     deck.push(
       normalCardTypes[Math.floor(Math.random() * normalCardTypes.length)]
     );
+  }
+
+  for (let i = 0; i < numPlayers; i++) {
+    deck.push("hot_potato");
   }
   shuffle(deck);
   return [deck, playerHands];
@@ -182,7 +182,7 @@ export const updateGameState = (
       );
       break;
     case "explosion":
-      gameState.lastPlayedCard = "explosion";
+      gameState.lastPlayedCard = "None";
       if (gameState.explosionCardAtCurrentPlayer) {
         gameState.explosionCardAtCurrentPlayer = false;
         gameState.playersInGame = gameState.playersInGame.filter(

@@ -439,7 +439,9 @@ function Room() {
                   player: username,
                   avatar: players.find((player) => player.username === username)
                     ?.avatar,
-                  message: `${username} played hot potato , exploding chicken is passed to next player`,
+                  message: gameState?.explosionCardAtCurrentPlayer
+                    ? `${username} played hot potato , exploding chicken is passed to next player`
+                    : `${username} played hot potato`,
                 });
               }
 
