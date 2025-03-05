@@ -8,6 +8,7 @@ import Reverse from "/cards/reverse.png";
 import Shuffle from "/cards/shuffle.png";
 import Favor from "/cards/favor.png";
 import Future from "/cards/future.png";
+import HotPotato from "/cards/hot_potato.png";
 import { FaArrowRightLong } from "react-icons/fa6";
 
 const SeeTheFuture = ({
@@ -26,6 +27,7 @@ const SeeTheFuture = ({
     shuffle: Shuffle,
     favor: Favor,
     future: Future,
+    hot_potato: HotPotato,
   };
   const [countdown, setCountdown] = React.useState(5);
 

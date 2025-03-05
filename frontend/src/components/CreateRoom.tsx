@@ -11,7 +11,7 @@ import future from "/cards/future.png";
 import reverse from "/cards/reverse.png";
 import shuffle from "/cards/shuffle.png";
 import skip from "/cards/skip.png";
-
+import hotPotato from "/cards/hot_potato.png";
 import Card from "./Card";
 
 import { FaLinkedinIn } from "react-icons/fa";
@@ -105,6 +105,12 @@ const cardDescriptions = [
     imageSrc: skip,
     description:
       "Allows you to skip your turn without needing to draw a card. If you have multiple turns, the skip card only eliminates one of them.",
+  },
+  {
+    cardName: "Hot Potato",
+    imageSrc: hotPotato,
+    description:
+      "If you happen to draw an Exploding Chicken, your turn concludes as you pass the EC to the next player in line. They will now need to defuse it!",
   },
 ];
 

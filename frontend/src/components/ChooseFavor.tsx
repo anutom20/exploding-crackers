@@ -1,7 +1,5 @@
-import { useSnackbar } from "notistack";
 import { MoveType } from "../types";
 import { socket } from "../socket";
-import GameNotifications from "./GameNotifications";
 const ChooseFavor = ({
   players,
   playersInGame,
@@ -25,7 +23,6 @@ const ChooseFavor = ({
   eliminateTimeoutId: number | null;
   roomId: string;
 }) => {
-  const { enqueueSnackbar } = useSnackbar();
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -49,23 +46,13 @@ const ChooseFavor = ({
                     setEliminateTimeoutId(null);
                   }
                   setOpen(false);
-                  enqueueSnackbar(
-                    `${username} played favor , ${player.username} lost a card!!`,
-                    {
-                      variant: "info",
-                      anchorOrigin: {
-                        vertical: "bottom",
-                        horizontal: "right",
-                      },
-                      content: (
-                        <GameNotifications
-                          message={`${username} played favor , ${player.username} lost a card!!`}
-                          avatar={player.avatar}
-                          username={username}
-                        />
-                      ),
-                    }
-                  );
+
+                  socket.emit("gameNotification", {
+                    roomId,
+                    player: player.username,
+                    avatar: player.avatar,
+                    message: `${username} played favor , ${player.username} lost a card!!`,
+                  });
 
                   socket.emit("playCardSound", {
                     roomId,

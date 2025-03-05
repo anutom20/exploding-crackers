@@ -6,4 +6,5 @@ export type MoveType =
   | "reverse"
   | "attack"
   | "future"
-  | "shuffle";
+  | "shuffle"
+  | "hot_potato";

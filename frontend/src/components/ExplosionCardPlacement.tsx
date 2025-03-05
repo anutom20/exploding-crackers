@@ -1,6 +1,4 @@
 import { socket } from "../socket";
-import { useSnackbar } from "notistack";
-import GameNotifications from "./GameNotifications";
 const ExplosionCardPlacement = ({
   setOpen,
   setExplosionCardPlacement,
@@ -14,7 +12,7 @@ const ExplosionCardPlacement = ({
   setOpen: (open: boolean) => void;
   setExplosionCardPlacement: (placement: "top" | "random") => void;
   makeMove: (
-    move: "future" | "skip" | "reverse" | "defuse" | "explosion",
+    move: "future" | "skip" | "reverse" | "defuse" | "explosion" | "hot_potato",
     placeExplosionCardInMiddle?: boolean
   ) => void;
   setEliminateTimeoutId: (id: number | null) => void;
@@ -23,7 +21,6 @@ const ExplosionCardPlacement = ({
   username: string;
   players: { username: string; avatar: string }[];
 }) => {
-  const { enqueueSnackbar } = useSnackbar();
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -45,22 +42,12 @@ const ExplosionCardPlacement = ({
                 type: "DEFUSE",
               });
               setOpen(false);
-              enqueueSnackbar(`${username} played defuse`, {
-                variant: "info",
-                anchorOrigin: {
-                  vertical: "bottom",
-                  horizontal: "right",
-                },
-                content: (
-                  <GameNotifications
-                    message={`${username} played defuse`}
-                    avatar={
-                      players.find((player) => player.username === username)
-                        ?.avatar
-                    }
-                    username={username}
-                  />
-                ),
+              socket.emit("gameNotification", {
+                roomId,
+                player: username,
+                avatar: players.find((player) => player.username === username)
+                  ?.avatar,
+                message: `${username} played defuse`,
               });
             }}
           >
@@ -80,22 +67,12 @@ const ExplosionCardPlacement = ({
                 type: "DEFUSE",
               });
               setOpen(false);
-              enqueueSnackbar(`${username} played defuse`, {
-                variant: "info",
-                anchorOrigin: {
-                  vertical: "bottom",
-                  horizontal: "right",
-                },
-                content: (
-                  <GameNotifications
-                    message={`${username} played defuse`}
-                    avatar={
-                      players.find((player) => player.username === username)
-                        ?.avatar
-                    }
-                    username={username}
-                  />
-                ),
+              socket.emit("gameNotification", {
+                roomId,
+                player: username,
+                message: `${username} played defuse`,
+                avatar: players.find((player) => player.username === username)
+                  ?.avatar,
               });
             }}
           >

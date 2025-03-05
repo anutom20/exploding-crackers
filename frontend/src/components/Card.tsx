@@ -27,8 +27,10 @@ const Card = ({
         return "#21A83C";
       case "future":
         return "#FF66C4";
+      case "hot_potato":
+        return "#E9B169";
       default:
-        return "#21A83C";
+        return "#E9B169";
     }
   };
 

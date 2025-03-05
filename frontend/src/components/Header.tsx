@@ -30,7 +30,10 @@ const Header = ({
   }, [elimiateCountdown]);
 
   useEffect(() => {
-    if (currentPlayerTurn === currentUser || currentPlayerTurnAgain) {
+    if (
+      currentPlayerTurn === currentUser ||
+      (currentPlayerTurnAgain && currentPlayerTurn === currentUser)
+    ) {
       dispatch({ type: "TURN_SOUND" });
     }
   }, [currentPlayerTurn, currentPlayerTurnAgain]);

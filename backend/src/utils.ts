@@ -31,12 +31,22 @@ function shuffle(array: any[]) {
 
 export function createDeck(numPlayers: number) {
   const deck: any[] = [];
-  const totalCards = numPlayers * 4;
-  for (let i = 0; i < totalCards; i++) {
-    deck.push(
-      normalCardTypes[Math.floor(Math.random() * normalCardTypes.length)]
-    );
+  const totalCards = numPlayers * 5;
+  const cardsPerType = totalCards / normalCardTypes.length;
+  for (let i = 0; i < normalCardTypes.length; i++) {
+    for (let j = 0; j < cardsPerType; j++) {
+      deck.push(normalCardTypes[i]);
+    }
   }
+
+  for (let i = 0; i < totalCards % normalCardTypes.length; i++) {
+    deck.push(normalCardTypes[i]);
+  }
+
+  for (let i = 0; i < numPlayers; i++) {
+    deck.push("hot_potato");
+  }
+
   shuffle(deck);
   return deck;
 }
@@ -54,7 +64,7 @@ export function distributeCards(
       playerHands[playerUsernames[i]] = [];
     }
   }
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     for (let j = 0; j < numPlayers; j++) {
       playerHands[playerUsernames[j]].push(deck.pop()); // Get the last element
     }
@@ -63,6 +73,7 @@ export function distributeCards(
   for (let j = 0; j < numPlayers; j++) {
     playerHands[playerUsernames[j]].push("defuse");
   }
+
   for (let i = 0; i < numExplodingBombCards; i++) {
     deck.push("explosion");
   }
@@ -159,6 +170,16 @@ export const updateGameState = (
         }
       }
       removeCardFromHand(gameState, gameState.currentPlayerTurn, "defuse");
+      break;
+
+    case "hot_potato":
+      gameState.lastPlayedCard = "hot_potato";
+      removeCardFromHand(gameState, gameState.currentPlayerTurn, "hot_potato");
+      gameState.currentPlayerTurn = getNextPlayer(
+        gameState.currentPlayerTurn,
+        playerUsernames,
+        gameState.gameDirection
+      );
       break;
     case "explosion":
       gameState.lastPlayedCard = "explosion";

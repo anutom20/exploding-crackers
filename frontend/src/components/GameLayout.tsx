@@ -10,6 +10,7 @@ import Skip from "/cards/skip.png";
 import Reverse from "/cards/reverse.png";
 import Shuffle from "/cards/shuffle.png";
 import Favor from "/cards/favor.png";
+import HotPotato from "/cards/hot_potato.png";
 import SeeTheFuture from "/cards/future.png";
 import { FiPlus } from "react-icons/fi";
 import Card from "./Card";
@@ -58,6 +59,7 @@ const GameLayout = ({
     shuffle: Shuffle,
     favor: Favor,
     future: SeeTheFuture,
+    hot_potato: HotPotato,
   };
 
   useEffect(() => {

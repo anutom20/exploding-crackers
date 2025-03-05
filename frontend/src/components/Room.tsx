@@ -82,22 +82,15 @@ function Room() {
   }, [gameState]);
 
   useEffect(() => {
-    if (gameState?.explosionCardAtCurrentPlayer) {
-      enqueueSnackbar(`${username} drew a chicken card`, {
-        variant: "info",
-        anchorOrigin: {
-          vertical: "bottom",
-          horizontal: "right",
-        },
-        content: (
-          <GameNotifications
-            message={`${username} drew a chicken card`}
-            avatar={
-              players.find((player) => player.username === username)?.avatar
-            }
-            username={username}
-          />
-        ),
+    if (
+      gameState?.explosionCardAtCurrentPlayer &&
+      username === gameState?.currentPlayerTurn
+    ) {
+      socket.emit("gameNotification", {
+        roomId,
+        player: username,
+        avatar: players.find((player) => player.username === username)?.avatar,
+        message: `${username} drew a chicken card`,
       });
       socket.emit("playCardSound", {
         roomId,
@@ -122,8 +115,25 @@ function Room() {
       dispatch({ type });
     });
 
+    socket.on("gameNotification", (notification) => {
+      enqueueSnackbar(notification?.message, {
+        variant: "info",
+        anchorOrigin: {
+          vertical: "bottom",
+          horizontal: "right",
+        },
+        content: (
+          <GameNotifications
+            message={notification?.message}
+            avatar={notification?.avatar}
+            username={notification?.player}
+          />
+        ),
+        autoHideDuration: 3000,
+      });
+    });
+
     socket.on("gameStateUpdate", (gameState) => {
-      console.log("Game state updated:", gameState);
       if (gameState.gameCompleted) {
         setShowWinner(true);
         return;
@@ -183,7 +193,11 @@ function Room() {
       }, 1000);
 
       return () => clearTimeout(timer);
-    } else if (countdownGoing && loseCountdown === 0) {
+    } else if (
+      countdownGoing &&
+      loseCountdown === 0 &&
+      username === gameState?.currentPlayerTurn
+    ) {
       socket.emit("stopCountdownRequest", roomId);
       socket.emit("updateGameState", {
         roomId,
@@ -194,21 +208,11 @@ function Room() {
         roomId,
         type: "EXPLOSION",
       });
-      enqueueSnackbar(`${username} exploded`, {
-        variant: "error",
-        anchorOrigin: {
-          vertical: "bottom",
-          horizontal: "right",
-        },
-        content: (
-          <GameNotifications
-            message={`${username} exploded`}
-            avatar={
-              players.find((player) => player.username === username)?.avatar
-            }
-            username={username}
-          />
-        ),
+      socket.emit("gameNotification", {
+        roomId,
+        avatar: players.find((player) => player.username === username)?.avatar,
+        player: username,
+        message: `${username} exploded`,
       });
     }
   }, [countdownGoing, loseCountdown]);
@@ -248,9 +252,13 @@ function Room() {
   ) => {
     console.log("makeMove", move, placeExplosionCardInMiddle);
     if (gameState?.currentPlayerTurn === username) {
-      if (gameState?.explosionCardAtCurrentPlayer && move !== "defuse") {
+      if (
+        gameState?.explosionCardAtCurrentPlayer &&
+        move !== "defuse" &&
+        move !== "hot_potato"
+      ) {
         alert(
-          "Only defuse card can be played when explosion card is at current player"
+          "Only defuse or hot potato card can be played when explosion card is at current player"
         );
         return;
       }
@@ -425,41 +433,31 @@ function Room() {
                 });
               }
 
+              if (move === "hot_potato") {
+                socket.emit("gameNotification", {
+                  roomId,
+                  player: username,
+                  avatar: players.find((player) => player.username === username)
+                    ?.avatar,
+                  message: `${username} played hot potato , exploding chicken is passed to next player`,
+                });
+              }
+
               if (move !== "draw") {
-                enqueueSnackbar(`${username} played ${move}`, {
-                  variant: "info",
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "right",
-                  },
-                  content: (
-                    <GameNotifications
-                      message={`${username} played ${move}`}
-                      avatar={
-                        players.find((player) => player.username === username)
-                          ?.avatar
-                      }
-                      username={username}
-                    />
-                  ),
+                socket.emit("gameNotification", {
+                  roomId,
+                  player: username,
+                  avatar: players.find((player) => player.username === username)
+                    ?.avatar,
+                  message: `${username} played ${move}`,
                 });
               } else {
-                enqueueSnackbar(`${username} drew a card`, {
-                  variant: "info",
-                  anchorOrigin: {
-                    vertical: "bottom",
-                    horizontal: "right",
-                  },
-                  content: (
-                    <GameNotifications
-                      message={`${username} drew a card`}
-                      avatar={
-                        players.find((player) => player.username === username)
-                          ?.avatar
-                      }
-                      username={username}
-                    />
-                  ),
+                socket.emit("gameNotification", {
+                  roomId,
+                  player: username,
+                  avatar: players.find((player) => player.username === username)
+                    ?.avatar,
+                  message: `${username} drew a card`,
                 });
               }
             }}

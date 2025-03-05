@@ -164,6 +164,10 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("playCardSound", { type });
   });
 
+  socket.on("gameNotification", ({ roomId, player, message, avatar }) => {
+    io.to(roomId).emit("gameNotification", { player, message, avatar });
+  });
+
   socket.on("disconnect", () => {
     console.log("A user disconnected");
     const roomId = app.locals.socketRoomMap[socket.id];
